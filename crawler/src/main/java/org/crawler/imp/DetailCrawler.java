@@ -16,8 +16,9 @@ public class DetailCrawler extends Crawler<DetailPage> {
 		return true;
 	}
 
-	public void run() {
-		
+	public void processPage() {
+		//Tutaj kod dla przetwarzania danej strony
+		currentPage.getClass().getName();
 	}
 	
 }
