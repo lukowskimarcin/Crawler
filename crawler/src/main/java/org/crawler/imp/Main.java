@@ -6,8 +6,19 @@ public class Main {
 		
 		Manager manager = new Manager();
 		
+		
+		manager.addNewPage(new DetailPage("wp.pl"));
+		manager.addNewPage(new DetailPage("onet.pl"));
+		manager.addNewPage(new Page<Integer>("stooq.pl"));
+		manager.addNewPage(new NormalPage("google.com"));
+		
+		
+		
 		DetailCrawler crawler = new DetailCrawler(manager);
 		
+		manager.fetch(crawler);
+		manager.fetch(crawler);
+		manager.fetch(crawler);
 		manager.fetch(crawler);
 		manager.fetch(crawler);
 		

@@ -8,8 +8,9 @@ public class DetailCrawler extends Crawler<DetailPage> {
 
 	@Override
 	public boolean canParsePage(Page<?> page) {
-		System.out.println(		page.getClass().getName() );
-		return true;
+		String name = page.getClass().getName();
+		boolean test =  name.contains("DetailPage");
+		return test;
 	}
 
 	public void processPage() {

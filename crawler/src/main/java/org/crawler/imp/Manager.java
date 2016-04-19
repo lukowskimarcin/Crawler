@@ -128,9 +128,11 @@ public class Manager  {
 	 * @throws InterruptedException
 	 */
 	public Page<?> fetch(ICrawler crawler) throws InterruptedException {
-		Page<?> page = notProcessedPages.element();
-		if(page!=null && crawler.canParsePage(page)) {
-			return notProcessedPages.take();
+		if(notProcessedPages.size()>0) {
+			Page<?> page = notProcessedPages.element();
+			if(page!=null && crawler.canParsePage(page)) {
+				return notProcessedPages.take();
+			}
 		}
 		return null;
 	}
