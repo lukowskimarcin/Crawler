@@ -5,12 +5,10 @@ import org.crawler.Manager;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		// TODO Auto-generated method stub
-
-		DetailCrawler crawler = new DetailCrawler();
-		
 		
 		Manager manager = new Manager();
+		
+		DetailCrawler crawler = new DetailCrawler(manager);
 		
 		manager.fetch(crawler);
 		manager.fetch(crawler);

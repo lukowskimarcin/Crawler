@@ -1,19 +1,20 @@
 package org.crawler;
 
-public class Crawler<TPage extends Page<?>> implements ICrawler{
+/**
+ * 
+ *
+ * @param <TPage>
+ */
+public abstract class Crawler<TPage extends Page<?>> implements ICrawler{
 	private Manager manager;
 	private TPage currentPage;
 
-	public boolean canParsePage(Page<?> page) {
-		
-		 
-		System.out.println(		page.getClass().getName() );
-		
-		
-		
-		return true;
+	
+	public Crawler(Manager manager) {
+		this.manager = manager;
 	}
 	
-	 
+	public abstract boolean canParsePage(Page<?> page);
+	
 	
 }

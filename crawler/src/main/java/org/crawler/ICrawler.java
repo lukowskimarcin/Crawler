@@ -1,8 +1,13 @@
 package org.crawler;
 
-public interface ICrawler  {
-
+public interface ICrawler extends Runnable {
 	
 	boolean canParsePage(Page<?> page);
+	
+	
+
+	
+	
+	
 	
 }
