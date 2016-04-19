@@ -1,7 +1,11 @@
-package org.crawler;
+package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.crawler.CrawlerStatus;
+import org.crawler.ICrawler;
+import org.crawler.ICrawlingCallback;
 
 /**
  * Klasa bazowa dla Crawlera

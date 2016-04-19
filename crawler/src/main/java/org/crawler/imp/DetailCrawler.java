@@ -1,9 +1,5 @@
 package org.crawler.imp;
 
-import org.crawler.Crawler;
-import org.crawler.Manager;
-import org.crawler.Page;
-
 public class DetailCrawler extends Crawler<DetailPage> {
 
 	public DetailCrawler(Manager manager) {

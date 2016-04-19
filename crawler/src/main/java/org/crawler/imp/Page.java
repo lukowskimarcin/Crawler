@@ -1,6 +1,8 @@
-package org.crawler;
+package org.crawler.imp;
 
 import java.io.Serializable;
+
+import org.crawler.PageStatus;
 
 /**
  * Klasa bazowa przetwarzanych stron

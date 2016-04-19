@@ -1,7 +1,5 @@
 package org.crawler.imp;
 
-import org.crawler.Manager;
-
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {

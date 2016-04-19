@@ -1,5 +1,7 @@
 package org.crawler;
 
+import org.crawler.imp.Page;
+
 /**
  * Zdarzenia zwrotne crawlerow 
  * @author Marcin

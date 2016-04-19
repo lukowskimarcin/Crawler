@@ -1,4 +1,4 @@
-package org.crawler;
+package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.crawler.ICrawler;
+import org.crawler.ICrawlingCallback;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron
