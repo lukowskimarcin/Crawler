@@ -26,6 +26,11 @@ public abstract class Crawler<TPage extends Page<?>> implements ICrawler {
 		status = CrawlerStatus.STOPED;
 	}
 	
+	public Crawler(Manager manager, ICrawlingCallback listener) {
+		this(manager);
+		addCrawlingListener(listener);
+	}
+	
 	public void addCrawlingListener(ICrawlingCallback listener) {
 		if(callbacks==null) {
 			callbacks = new ArrayList<ICrawlingCallback>();
