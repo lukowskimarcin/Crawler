@@ -109,4 +109,16 @@ public abstract class Crawler<TPage extends Page<?>> implements ICrawler {
 		return status;
 	}
 	
+	/**
+	 * Pobiera losow proxy o ile są dostępne 
+	 * @return
+	 */
+	public Proxy getProxy(){
+		ProxyManager proxyManager = manager.getProxyManager();
+		if(proxyManager != null) {
+			return proxyManager.getProxy();
+		}
+		return null;
+	}
+	
 }

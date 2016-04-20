@@ -1,11 +1,14 @@
 package org.crawler.imp;
 
+import java.io.Serializable;
+
 /**
  * Proxy serwerów
  * @author Marcin
  *
  */
-public class Proxy {
+public class Proxy implements Serializable {
+	private static final long serialVersionUID = 925740658693615705L;
 	private String host;
 	private String port;
 	

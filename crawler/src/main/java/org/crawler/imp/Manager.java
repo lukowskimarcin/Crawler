@@ -33,6 +33,9 @@ public class Manager  {
 	
 	private ICrawlingCallback callback;
 	
+	private ProxyManager proxyManager;
+	
+	
 	public Manager() {
 	}
 
@@ -43,7 +46,7 @@ public class Manager  {
 	public Manager(ICrawlingCallback callback) {
 		this.callback = callback;
 	}
-
+	
 	/**
 	 * Dodaje crawlera. Jeśli jest zdefiniowany globalny 
 	 * obserwator zdarzeń, to przekazuje go do crawlera
@@ -136,5 +139,17 @@ public class Manager  {
 		}
 		return null;
 	}
+
+	
+	public ProxyManager getProxyManager() {
+		return proxyManager;
+	}
+
+	public void setProxyManager(ProxyManager proxyManager) {
+		this.proxyManager = proxyManager;
+	}
+	
+	
+	
 	
 }
