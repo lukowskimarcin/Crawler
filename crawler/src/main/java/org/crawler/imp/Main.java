@@ -9,7 +9,7 @@ public class Main {
 		
 		manager.addNewPage(new DetailPage("wp.pl"));
 		manager.addNewPage(new DetailPage("onet.pl"));
-		manager.addNewPage(new Page<Integer>("stooq.pl"));
+		manager.addNewPage(new PageTask<Integer>("stooq.pl"));
 		manager.addNewPage(new NormalPage("google.com"));
 		
 		

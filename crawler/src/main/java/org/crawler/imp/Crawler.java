@@ -3,7 +3,6 @@ package org.crawler.imp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.crawler.CrawlerStatus;
 import org.crawler.ICrawler;
 import org.crawler.ICrawlingCallback;
 
@@ -12,24 +11,40 @@ import org.crawler.ICrawlingCallback;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class Crawler<TPage extends Page<?>> implements ICrawler {
-	private final static long WAITING_FOR_PAGE_TIMEOUT = 100;
-	
+public abstract class Crawler<T extends Page<?>> implements ICrawler<T>   {
 	private Manager manager;
-	private CrawlerStatus status;
 	private List<ICrawlingCallback> callbacks;
-	
-	protected TPage currentPage;
+	private T pageResult;
 	
 	public Crawler(Manager manager) {
 		this.manager = manager;
-		status = CrawlerStatus.STOPED;
 	}
 	
 	public Crawler(Manager manager, ICrawlingCallback listener) {
 		this(manager);
 		addCrawlingListener(listener);
 	}
+	
+	public abstract boolean canParsePage(PageTask<?> page);
+	
+	public abstract T processPage();
+	
+	/**
+	 * Urochomienie zadania przetworzenia strony
+	 */
+	public T call() throws Exception {
+		try {
+			fireOnPageCrawlingStartEvent();
+		
+			pageResult = processPage();
+		
+			fireOnPageCrawlingCompletedEvent();
+		}catch (Exception ex) {
+			fireOnPageCrawlingFailedEvent(ex);
+		}
+		return null;
+	}
+	
 	
 	public void addCrawlingListener(ICrawlingCallback listener) {
 		if(callbacks==null) {
@@ -39,75 +54,32 @@ public abstract class Crawler<TPage extends Page<?>> implements ICrawler {
 	}
 	
 	private void fireOnPageCrawlingStartEvent(){
-		status = CrawlerStatus.PROCESSING_PAGE;
 		if(callbacks!=null) {
 			for(ICrawlingCallback callback : callbacks) {
-				callback.onPageCrawlingStart(this, currentPage);
+				callback.onPageCrawlingStart(this, null);
 			}
 		}
 	}
 	
 	private void fireOnPageCrawlingCompletedEvent(){
-		status = CrawlerStatus.WAITING_FOR_PAGE;
-		manager.addProcessedPage(currentPage);
+		manager.addProcessedPage(null);
 		if(callbacks!=null) {
 			for(ICrawlingCallback callback : callbacks) {
-				callback.onPageCrawlingCompleted(this, currentPage);
+				callback.onPageCrawlingCompleted(this, null);
 			}
 		}
-		currentPage = null;
 	}
 	
 	private void fireOnPageCrawlingFailedEvent(Exception ex){
-		status = CrawlerStatus.PAGE_ERROR;
-		currentPage.setErrorMessage(ex.getMessage());
+		pageResult.setErrorMessage(ex.getMessage());
 		
-		manager.addErrorPage(currentPage);
 		if(callbacks!=null) {
 			for(ICrawlingCallback callback : callbacks) {
-				callback.onPageCrawlingFailed(this, currentPage);
+				callback.onPageCrawlingFailed(this, null);
 			}
 		}
-		currentPage = null;
 	}
-	
-	@SuppressWarnings("unchecked")
-	public void run() {
-		try {
-			do {
-				currentPage = (TPage) manager.fetch(this);
-				if (currentPage == null) {
-					// Brak strony do przetwarzania czekaj
-					status = CrawlerStatus.WAITING_FOR_PAGE;
-					Thread.sleep(WAITING_FOR_PAGE_TIMEOUT);
-				} else {
-					try {
-						fireOnPageCrawlingStartEvent();
-						processPage();
-						fireOnPageCrawlingCompletedEvent();
-					} catch (Exception e) {
-						fireOnPageCrawlingFailedEvent(e);
-					}
-				}
-			} while (status != CrawlerStatus.STOPED);
-			
-		} catch (InterruptedException ex) {
-			status = CrawlerStatus.CRAWLER_ERROR;
-			ex.printStackTrace();
-		}
-	}
-	
-	public abstract boolean canParsePage(Page<?> page);
-	
-	public abstract void processPage();
-	
-	public TPage getCurrentPage() {
-		return currentPage;
-	}
-	
-	public CrawlerStatus getStatus() {
-		return status;
-	}
+	 
 	
 	/**
 	 * Pobiera losow proxy o ile są dostępne 

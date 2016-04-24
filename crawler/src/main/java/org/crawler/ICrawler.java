@@ -1,5 +1,7 @@
 package org.crawler;
 
+import java.util.concurrent.Callable;
+
 import org.crawler.imp.Page;
 
 /**
@@ -7,24 +9,21 @@ import org.crawler.imp.Page;
  * @author Marcin
  *
  */
-public interface ICrawler extends Runnable {
+public interface ICrawler<T extends Page<?>> extends Callable<T> {
 	
 	/**
 	 * Metoda sprawdza czy dana strona może być obsłużona przez danego crawlera
 	 * @param page
 	 * @return
 	 */
-	boolean canParsePage(Page<?> page);
+	boolean canParsePage(Page page);
 	
 	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera
 	 * @param listener
 	 */
 	void addCrawlingListener(ICrawlingCallback listener);
+
 	
-	/**
-	 * Przetwarzanie danych strony
-	 */
-	void processPage();
-	
+	T processPage();
 }

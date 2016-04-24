@@ -19,12 +19,12 @@ import org.crawler.ICrawlingCallback;
 public class Manager  {
 	
 	//Strony do przetworzenia
-	private BlockingQueue< Page<?> > notProcessedPages = new LinkedBlockingQueue<Page<?> >();
+	private BlockingQueue< PageTask<?> > notProcessedPages = new LinkedBlockingQueue<PageTask<?> >();
 	
 	//Strony już przetworzone
-	private BlockingQueue< Page<?> > processedPages = new LinkedBlockingQueue<Page<?> >();
+	private BlockingQueue< PageTask<?> > processedPages = new LinkedBlockingQueue<PageTask<?> >();
 	
-	private BlockingQueue< Page<?> > errorPages = new LinkedBlockingQueue<Page<?> >();
+	private BlockingQueue< PageTask<?> > errorPages = new LinkedBlockingQueue<PageTask<?> >();
 	
 	//Do sprawdzenia czy dana strona nie była już procesowana
 	private  ConcurrentMap<String, Boolean> crawledURL = new ConcurrentHashMap<String, Boolean>();
@@ -81,7 +81,7 @@ public class Manager  {
 	 * @param page
 	 * @return true jeśli nie była wcześniej dodawana do przetwarzania
 	 */
-	public  boolean addNewPage(Page<?> page){
+	public  boolean addNewPage(PageTask<?> page){
 		if(crawledURL.containsKey(page.getUrl())) {
 			return false;
 		} else {
@@ -96,7 +96,7 @@ public class Manager  {
 	 * Dodaje poprawnie przetworzoną stronę
 	 * @param page : strona
 	 */
-	public void addProcessedPage(Page<?> page) {
+	public void addProcessedPage(PageTask<?> page) {
 		processedPages.add(page);
 	}
 	
@@ -104,7 +104,7 @@ public class Manager  {
 	 * Lista poprawnie przetworzonych stron
 	 * @return
 	 */
-	public BlockingQueue<Page<?>> getProcessedPages(){
+	public BlockingQueue<PageTask<?>> getProcessedPages(){
 		return processedPages;
 	}
 	
@@ -112,7 +112,7 @@ public class Manager  {
 	 * Dodaje błędnie przetworzoną stronę
 	 * @param page : strona
 	 */
-	public void addErrorPage(Page<?> page) {
+	public void addErrorPage(PageTask<?> page) {
 		errorPages.add(page);
 	}
 	
@@ -120,7 +120,7 @@ public class Manager  {
 	 * Lista błędnie przetworzonych stron
 	 * @return
 	 */
-	public BlockingQueue<Page<?>> getErrorPages(){
+	public BlockingQueue<PageTask<?>> getErrorPages(){
 		return errorPages;
 	}
 	 
@@ -130,9 +130,9 @@ public class Manager  {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public Page<?> fetch(ICrawler crawler) throws InterruptedException {
+	public PageTask<?> fetch(ICrawler crawler) throws InterruptedException {
 		if(notProcessedPages.size()>0) {
-			Page<?> page = notProcessedPages.element();
+			PageTask<?> page = notProcessedPages.element();
 			if(page!=null && crawler.canParsePage(page)) {
 				return notProcessedPages.take();
 			}

@@ -1,6 +1,6 @@
 package org.crawler.imp;
 
-public class NormalPage extends Page<Integer>{
+public class NormalPage extends PageTask<Integer>{
 	public NormalPage(String url) {
 		super(url);
 	}
