@@ -3,6 +3,7 @@ package org.crawler.imp;
 import java.util.concurrent.FutureTask;
 
 import org.crawler.ICrawler;
+import org.crawler.Page;
 
 /**
  * Zadanie przetworzenia strony

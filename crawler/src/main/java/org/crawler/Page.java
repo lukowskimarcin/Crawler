@@ -1,12 +1,9 @@
-package org.crawler.imp;
+package org.crawler;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-
-import org.crawler.ICrawler;
-import org.crawler.PageStatus;
 
 /**
  * Klasa bazowa przetwarzanych stron
@@ -14,7 +11,7 @@ import org.crawler.PageStatus;
  *
  * @param <T> typ danych pobierany dla strony
  */
-public  class Page<T>   implements Serializable {
+public class Page<T> implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
 	private String url;

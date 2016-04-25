@@ -1,5 +1,6 @@
 package org.crawler.imp;
 
+import org.crawler.Crawler;
 import org.crawler.ICrawler;
 
 public class DetailCrawler extends Crawler<DetailPage> implements ICrawler<NormalPage> {

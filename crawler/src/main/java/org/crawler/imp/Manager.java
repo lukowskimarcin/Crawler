@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 
 import org.crawler.ICrawler;
 import org.crawler.ICrawlingCallback;
+import org.crawler.Page;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron

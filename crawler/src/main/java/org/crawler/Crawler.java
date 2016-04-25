@@ -1,10 +1,12 @@
-package org.crawler.imp;
+package org.crawler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.crawler.ICrawler;
-import org.crawler.ICrawlingCallback;
+import org.crawler.imp.Manager;
+import org.crawler.imp.PageTask;
+import org.crawler.imp.Proxy;
+import org.crawler.imp.ProxyManager;
 
 /**
  * Klasa bazowa dla Crawlera

@@ -1,5 +1,7 @@
 package org.crawler.imp;
 
+import org.crawler.Page;
+
 public class NormalPage extends  Page<String> {
 	public NormalPage(String url) {
 		super(url,0);
