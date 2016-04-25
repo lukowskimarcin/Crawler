@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 import org.crawler.ICrawler;
 import org.crawler.ICrawlingCallback;
@@ -36,7 +42,34 @@ public class Manager  {
 	private ProxyManager proxyManager;
 	
 	
+	private  ExecutorService pool = Executors.newFixedThreadPool(10);
+	
+	
+	
 	public Manager() {
+		
+	  ICrawler<Page<String>> crawler = new ICrawler<Page<String>>() {
+		
+		public Page<String> call() throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		 
+		
+		public void addCrawlingListener(ICrawlingCallback listener) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+	
+		PageTask<Page<String>> task = new PageTask<Page<String>>(crawler);
+		pool.execute(task);  
+		
+		ExecutorService ss = Executors.newWorkStealingPool();
+		
+		 
+		 
+		
 	}
 
 	/**

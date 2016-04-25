@@ -1,6 +1,8 @@
 package org.crawler.imp;
 
-public class DetailCrawler extends Crawler<DetailPage> {
+import org.crawler.ICrawler;
+
+public class DetailCrawler extends Crawler<DetailPage> implements ICrawler<NormalPage> {
 
 	public DetailCrawler(Manager manager) {
 		super(manager);
@@ -13,9 +15,8 @@ public class DetailCrawler extends Crawler<DetailPage> {
 		return test;
 	}
 
-	public void processPage() {
+	public DetailPage processPage() {
 		//Tutaj kod dla przetwarzania danej strony
-		currentPage.getClass().getName();
 	}
 
 	public DetailPage call() throws Exception {
