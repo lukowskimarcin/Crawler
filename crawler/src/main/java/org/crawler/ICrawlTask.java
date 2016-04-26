@@ -1,13 +1,12 @@
 package org.crawler;
 
-import java.util.concurrent.Callable;
 
 /**
  * Interfejs crawlera
  * @author Marcin
  *
  */
-public interface ICrawler<T extends Page<?>> extends Callable<T> {
+public interface ICrawlTask  {
 	
 	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera
@@ -15,6 +14,8 @@ public interface ICrawler<T extends Page<?>> extends Callable<T> {
 	 */
 	void addCrawlingListener(ICrawlingCallback listener);
 
-	
-	T processPage();
+	/**
+	 * Metoda przetwarzająca stronę
+	 */
+	void processPage();
 }

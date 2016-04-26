@@ -1,12 +1,9 @@
-package org.crawler;
+package org.crawler.imp;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 /**
- * Klasa bazowa przetwarzanych stron
+ * Przetwarzana strona
  * @author Marcin
  *
  * @param <T> typ danych pobierany dla strony
@@ -15,14 +12,16 @@ public class Page<T> implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
 	private String url;
-	private PageStatus status;
 	private String errorMessage;
 	private int level;
 	private T data;
 	
+	public Page(String url) {
+		this(url, 0);
+	}
+	
 	
 	public Page(String url, int level) {
-		status = PageStatus.NOT_VISITED;
 		this.url = url;
 		this.level = level;
 	}
@@ -40,14 +39,6 @@ public class Page<T> implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public PageStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(PageStatus status) {
-		this.status = status;
 	}
 
 	public String getErrorMessage() {

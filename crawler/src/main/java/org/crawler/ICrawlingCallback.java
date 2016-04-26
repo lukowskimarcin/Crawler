@@ -1,6 +1,6 @@
 package org.crawler;
 
-import org.crawler.imp.PageTask;
+import org.crawler.imp.Page;
 
 /**
  * Zdarzenia zwrotne crawlerow 
@@ -14,20 +14,20 @@ public interface ICrawlingCallback {
 	 * @param crawler 
 	 * @param page
 	 */
-	void onPageCrawlingStart(ICrawler crawler, PageTask<?> page); 
+	void onPageCrawlingStart(ICrawlTask crawler, Page<?> page); 
 	
 	/**
 	 * Zdarzenie zakończenia przetwarzania strony
 	 * @param crawler
 	 * @param page
 	 */
-	void onPageCrawlingCompleted(ICrawler crawler, PageTask<?> page);
+	void onPageCrawlingCompleted(ICrawlTask crawler, Page<?> page);
 	
 	/**
 	 * Zdarzenie błędu przetwarzania strony
 	 * @param crawler
 	 * @param page
 	 */
-	void onPageCrawlingFailed(ICrawler crawler, PageTask<?> page);
+	void onPageCrawlingFailed(ICrawlTask crawler, Page<?> page);
 	
 }
