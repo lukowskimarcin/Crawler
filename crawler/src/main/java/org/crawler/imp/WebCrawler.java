@@ -2,6 +2,7 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletionService;
@@ -16,77 +17,55 @@ import java.util.function.Consumer;
 
 import org.crawler.ICrawlTask;
 import org.crawler.ICrawlingCallback;
+import org.crawler.IWebCrawler;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron
  * @author Marcin
  *
  */
-public class WebCrawler  {
-	
-	//Strony do przetworzenia
-	private BlockingQueue< Page<?> > notProcessedPages = new LinkedBlockingQueue<Page<?> >();
-	
+public class WebCrawler<T extends Page<?>> implements IWebCrawler<T>  {
+	 
 	//Strony już przetworzone
-	private BlockingQueue< Page<?> > processedPages = new LinkedBlockingQueue<Page<?> >();
+	private HashSet<T> visitedPages = new HashSet<T>(); 
+	private List<T> errorPages = new ArrayList<T>();
 	
-	private BlockingQueue< Page<?> > errorPages = new LinkedBlockingQueue<Page<?> >();
-	
-	//Lista zadań
-	private List<ICrawlTask> crawlers = new ArrayList<ICrawlTask>();
-	
-	private ICrawlingCallback callback;
+	private ICrawlingCallback<T> callback;
 	
 	private ProxyManager proxyManager;
 	
-	private  ExecutorService pool = Executors.newFixedThreadPool(10);
-
+	private  ExecutorService pool;
+	
+	public WebCrawler() {
+		pool = Executors.newFixedThreadPool(100);
+	}
+	
 	
 	/**
 	 * Tworzy Managera z zdefiniowanym obserwatorem
 	 * @param callback : obserwator zdarzeń
 	 */
-	public WebCrawler(ICrawlingCallback callback) {
+	public WebCrawler(ICrawlingCallback<T> callback) {
 		this.callback = callback;
 	}
 	
-	/**
-	 * Dodaje crawlera. Jeśli jest zdefiniowany globalny 
-	 * obserwator zdarzeń, to przekazuje go do crawlera
-	 * @param crawler
-	 */
-	public void addCrawler(ICrawlTask crawler) {
-		crawlers.add(crawler);
-		//Dodanie globalnego listenera crawlerów
-		if(callback != null) {
-			crawler.addCrawlingListener(callback);
-		}
-		
-	}
-	 
-	
-	
-	/**
-	 * Dodaje poprawnie przetworzoną stronę
-	 * @param page : strona
-	 */
-	public void addProcessedPage(Page<?> page) {
-		processedPages.add(page);
+	public ICrawlingCallback<T> getCallbackListener() {
+		return callback;
 	}
 	
-	/**
-	 * Lista poprawnie przetworzonych stron
-	 * @return
-	 */
-	public BlockingQueue<Page<?>> getProcessedPages(){
-		return processedPages;
+	public boolean isVisited(T page) {
+		return visitedPages.contains(page);
+	}
+
+	public synchronized void addVisited(T page) {
+		visitedPages.add(page);
 	}
 	
 	/**
 	 * Dodaje błędnie przetworzoną stronę
 	 * @param page : strona
 	 */
-	public void addErrorPage(Page<?> page) {
+	public synchronized void addErrorPage(T page) {
 		errorPages.add(page);
 	}
 	
@@ -94,7 +73,7 @@ public class WebCrawler  {
 	 * Lista błędnie przetworzonych stron
 	 * @return
 	 */
-	public BlockingQueue<Page<?>> getErrorPages(){
+	public List<T> getErrorPages(){
 		return errorPages;
 	}
 	

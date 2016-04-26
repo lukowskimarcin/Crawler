@@ -3,7 +3,6 @@ package org.crawler.imp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.crawler.ICrawlTask;
@@ -15,56 +14,80 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract  class CrawlTask<T extends Page<?>> extends RecursiveAction implements ICrawlTask   {
-	private List<ICrawlingCallback> callbacks;
+public  abstract  class CrawlTask<T extends Page<?>> extends RecursiveAction implements ICrawlTask<T>   {
+	private static final long serialVersionUID = 7715097372705014994L;
+
+	private List<ICrawlingCallback<T>> callbacks;
 	
-	protected IWebCrawler webCrawler;
+	protected IWebCrawler<T> webCrawler;
 	protected T page;
 	
-	public CrawlTask(IWebCrawler webCrawler, T page) {
+	public CrawlTask(IWebCrawler<T> webCrawler, T page) {
 		this.webCrawler = webCrawler;
 		this.page = page;
 	}
 	
-	public CrawlTask(IWebCrawler webCrawler, T page, ICrawlingCallback listener) {
+	public CrawlTask(IWebCrawler<T> webCrawler, T page, ICrawlingCallback<T> listener) {
 		this(webCrawler, page);
 		addCrawlingListener(listener);
 	}
-	
+	 
 	public abstract void processPage();
 
 	@Override
 	protected void compute() {
 		try {
-			fireOnPageCrawlingStartEvent();
+			
 		
-			processPage();
+			if(!webCrawler.isVisited(page)) {
+				webCrawler.addVisited(page);
+				
+				fireOnPageCrawlingStartEvent();
+				processPage();	
+				
+				fireOnPageCrawlingCompletedEvent();
+			} else {
+				fireOnAlreadyVisitedEvent();
+			}
 		
-			fireOnPageCrawlingCompletedEvent();
+			
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
 	}
 
 	 
-	public void addCrawlingListener(ICrawlingCallback listener) {
+	public void addCrawlingListener(ICrawlingCallback<T> listener) {
 		if(callbacks==null) {
-			callbacks = new ArrayList<ICrawlingCallback>();
+			callbacks = new ArrayList<ICrawlingCallback<T>>();
 		}
 		callbacks.add(listener);
 	}
 	
-	private void fireOnPageCrawlingStartEvent(){
+	public T getPage() { 
+		return page;
+	}
+	
+	protected void fireOnPageCrawlingStartEvent(){
 		throw new NotImplementedException();
 	}
 	
-	private void fireOnPageCrawlingCompletedEvent(){
+	protected void fireOnPageCrawlingCompletedEvent(){
 		throw new NotImplementedException();
 	}
 	
-	private void fireOnPageCrawlingFailedEvent(Exception ex){
+	protected void fireOnPageCrawlingFailedEvent(Exception ex){
 		throw new NotImplementedException();
 	}
+	
+	protected void fireOnAlreadyVisitedEvent() {
+		throw new NotImplementedException();
+	}
+
+	protected void fireOnPageProcessingProgressEvent() {
+		throw new NotImplementedException();
+	}
+	
  
 	
 }

@@ -20,10 +20,15 @@ public class Page<T> implements Serializable {
 		this(url, 0);
 	}
 	
-	
 	public Page(String url, int level) {
 		this.url = url;
 		this.level = level;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Page<?> second = (Page<?>) obj;
+		return  url.equals(second.getUrl());
 	}
 	
 	public T getData() {
