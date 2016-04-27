@@ -3,7 +3,6 @@ package org.crawler.imp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.crawler.ICrawlTask;
 import org.crawler.ICrawlingCallback;
 import org.crawler.IWebCrawler;
