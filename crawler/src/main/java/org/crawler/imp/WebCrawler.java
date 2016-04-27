@@ -53,6 +53,24 @@ public class WebCrawler<T extends Page<?>> implements IWebCrawler<T>  {
 		return callback;
 	}
 	
+	public boolean addCrawlTask(ICrawlTask<T> task) {
+		T page = task.getPage();
+		
+		if(!isVisited(page)) {
+			//Dodaje strone do odwiedzanych
+			addVisited(page);
+			
+			//Dodanie do wykonania
+			pool.submit(task);
+			
+		}
+		
+		return false;
+	}
+	
+	
+	
+	
 	public boolean isVisited(T page) {
 		return visitedPages.contains(page);
 	}

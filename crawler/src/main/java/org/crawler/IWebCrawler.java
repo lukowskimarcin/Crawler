@@ -25,4 +25,6 @@ public interface IWebCrawler<T extends Page<?>> {
 	 */
 	ICrawlingCallback<T> getCallbackListener();
 	
+	
+	
 }

@@ -1,5 +1,7 @@
 package org.crawler;
 
+import java.util.concurrent.Callable;
+
 import org.crawler.imp.Page;
 
 /**
@@ -7,7 +9,7 @@ import org.crawler.imp.Page;
  * @author Marcin
  *
  */
-public interface ICrawlTask<T extends Page<?>>  {
+public interface ICrawlTask<T extends Page<?>> extends Callable<T> {
 	
 	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera
