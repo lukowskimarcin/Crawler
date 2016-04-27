@@ -2,7 +2,6 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RecursiveAction;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.crawler.ICrawlTask;
@@ -14,36 +13,38 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public  abstract  class CrawlTask<T extends Page<?>> extends RecursiveAction implements ICrawlTask<T>   {
-	private static final long serialVersionUID = 7715097372705014994L;
-
+public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 	private List<ICrawlingCallback<T>> callbacks;
 	
 	protected IWebCrawler<T> webCrawler;
 	protected T page;
 	
-	public CrawlTask(IWebCrawler<T> webCrawler, T page) {
-		this.webCrawler = webCrawler;
+	public CrawlTask(T page) {
 		this.page = page;
 	}
 	
-	public CrawlTask(IWebCrawler<T> webCrawler, T page, ICrawlingCallback<T> listener) {
-		this(webCrawler, page);
+	public CrawlTask(T page, ICrawlingCallback<T> listener) {
+		this(page);
 		addCrawlingListener(listener);
 	}
 	 
-	public abstract void processPage();
-
-	@Override
-	protected void compute() {
+	public abstract void parsePage();
+	
+	public void init(IWebCrawler<T> webCrawler) {
+		this.webCrawler = webCrawler;
+		ICrawlingCallback<T> callback = webCrawler.getCrawlingListener();
+		if(callback!=null) {
+			addCrawlingListener(callback);
+		}
+	}
+	
+	public T call() throws Exception {
 		try {
-			
-		
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
 				
 				fireOnPageCrawlingStartEvent();
-				processPage();	
+				parsePage();	
 				
 				fireOnPageCrawlingCompletedEvent();
 			} else {
@@ -54,8 +55,8 @@ public  abstract  class CrawlTask<T extends Page<?>> extends RecursiveAction imp
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
+		return null;
 	}
-
 	 
 	public void addCrawlingListener(ICrawlingCallback<T> listener) {
 		if(callbacks==null) {
@@ -69,24 +70,21 @@ public  abstract  class CrawlTask<T extends Page<?>> extends RecursiveAction imp
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
-		throw new NotImplementedException();
 	}
 	
 	protected void fireOnPageCrawlingCompletedEvent(){
-		throw new NotImplementedException();
 	}
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
-		throw new NotImplementedException();
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {
-		throw new NotImplementedException();
 	}
 
 	protected void fireOnPageProcessingProgressEvent() {
-		throw new NotImplementedException();
 	}
+
+	
 	
  
 	

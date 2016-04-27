@@ -12,6 +12,12 @@ import org.crawler.imp.Page;
 public interface ICrawlTask<T extends Page<?>> extends Callable<T> {
 	
 	/**
+	 * Metoda inicjuje zadanie do wykonania
+	 * @param webCrawler crawler, który ma wykonać zadanie
+	 */
+	void init(IWebCrawler<T> webCrawler);
+	
+	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera
 	 * @param listener
 	 */
@@ -20,7 +26,11 @@ public interface ICrawlTask<T extends Page<?>> extends Callable<T> {
 	/**
 	 * Metoda przetwarzająca stronę
 	 */
-	void processPage();
+	void parsePage();
 	
+	/**
+	 * Metoda zwraca sotrone zgloszona do zadania
+	 * @return
+	 */
 	T getPage();
 }

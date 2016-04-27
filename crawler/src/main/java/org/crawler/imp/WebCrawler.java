@@ -1,19 +1,12 @@
 package org.crawler.imp;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
 
 import org.crawler.ICrawlTask;
 import org.crawler.ICrawlingCallback;
@@ -34,42 +27,32 @@ public class WebCrawler<T extends Page<?>> implements IWebCrawler<T>  {
 	
 	private ProxyManager proxyManager;
 	
-	private  ExecutorService pool;
+	private List<Future<T>> pagesTask = new ArrayList<Future<T>>();
 	
-	public WebCrawler() {
-		pool = Executors.newFixedThreadPool(100);
+	private ExecutorService pool;
+	
+	public WebCrawler( ) {
+		pool =  Executors.newFixedThreadPool(20);
 	}
-	
 	
 	/**
 	 * Tworzy Managera z zdefiniowanym obserwatorem
 	 * @param callback : obserwator zdarzeń
 	 */
 	public WebCrawler(ICrawlingCallback<T> callback) {
+		pool =  Executors.newFixedThreadPool(20);
 		this.callback = callback;
 	}
 	
-	public ICrawlingCallback<T> getCallbackListener() {
+	public ICrawlingCallback<T> getCrawlingListener() {
 		return callback;
 	}
 	
-	public boolean addCrawlTask(ICrawlTask<T> task) {
-		T page = task.getPage();
-		
-		if(!isVisited(page)) {
-			//Dodaje strone do odwiedzanych
-			addVisited(page);
-			
-			//Dodanie do wykonania
-			pool.submit(task);
-			
-		}
-		
-		return false;
+	public void submitCrawlTask(ICrawlTask<T> task) {
+		task.init(this);
+		Future<T> future = 	pool.submit(task);
+		pagesTask.add(future);
 	}
-	
-	
-	
 	
 	public boolean isVisited(T page) {
 		return visitedPages.contains(page);
@@ -103,4 +86,11 @@ public class WebCrawler<T extends Page<?>> implements IWebCrawler<T>  {
 		this.proxyManager = proxyManager;
 	}
 	
+	public List<Future<T>> getPagesTask() {
+		return pagesTask;
+	}
+	
+	public ICrawlingCallback<T> getCallback() {
+		return callback;
+	}
 }

@@ -20,11 +20,19 @@ public interface IWebCrawler<T extends Page<?>> {
 	
 	
 	/**
+	 * Metoda przekazuje zadanie do puli do wykonania
+	 * @param task:	
+	 */
+	void submitCrawlTask(ICrawlTask<T> task);
+	
+	
+	/**
 	 * Metoda zwraca globalnego obserwatora zdarzeń
 	 * @return
 	 */
-	ICrawlingCallback<T> getCallbackListener();
+	ICrawlingCallback<T> getCrawlingListener();
 	
+
 	
 	
 }
