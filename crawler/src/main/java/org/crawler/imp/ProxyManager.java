@@ -1,6 +1,12 @@
 package org.crawler.imp;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,6 +21,10 @@ import org.apache.commons.lang.NotImplementedException;
 public class ProxyManager {
 	private List<Proxy> proxies = new ArrayList<Proxy>();
 	
+	
+	public ProxyManager() {
+		
+	}
 	
 	public ProxyManager(List<Proxy> list) {
 		proxies = list;
@@ -59,7 +69,38 @@ public class ProxyManager {
 	 * Automatycznie usuwa nieaktywne
 	 */
 	public void testProxies() {
-		throw new NotImplementedException();
+		
+		List<Proxy> toRemove = new ArrayList<Proxy>();
+		for(Proxy proxy : proxies) {
+			try {
+				String proxyHost = proxy.getHost();
+				int proxyPort = proxy.getPort();
+				SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
+				java.net.Proxy httpProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, addr);
+				
+				URLConnection urlConn = null;
+				BufferedReader reader = null;
+				String response = "";
+				String output = "";
+				URL url = new URL("https://www.google.pl");
+				//Pass the Proxy instance defined above, to the openConnection() method
+				urlConn = url.openConnection(httpProxy); 
+				
+				urlConn.connect();
+				reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+				response = reader.readLine();
+				while (response!=null) {
+				    output+= response;
+				    response = reader.readLine();
+				}   
+				System.out.println("Output: " + output);
+				
+			}	catch (Exception ex) {
+				ex.printStackTrace();
+				toRemove.add(proxy);
+			}
+		}
+		proxies.removeAll(toRemove);
 	}
 	
 	/**
@@ -82,5 +123,19 @@ public class ProxyManager {
 		throw new NotImplementedException(); 
 	}	
 	
+	
+	
+	
+	public static void main(String[] args) {
+		//Lista proxy : http://prx.centrump2p.com/
+		
+		ProxyManager manager = new ProxyManager();
+		manager.addProxy(new Proxy("87.98.239.19", 80)); //OK
+		manager.addProxy(new Proxy("87.98.239.192", 820));
+		
+		manager.testProxies();
+		
+	}
+	 
 
 }

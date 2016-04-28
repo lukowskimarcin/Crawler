@@ -10,9 +10,9 @@ import java.io.Serializable;
 public class Proxy implements Serializable {
 	private static final long serialVersionUID = 925740658693615705L;
 	private String host;
-	private String port;
+	private int port;
 	
-	public Proxy(String host, String port) {
+	public Proxy(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
@@ -25,12 +25,17 @@ public class Proxy implements Serializable {
 		this.host = host;
 	}
 
-	public String getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	public void setPort(String port) {
+	public void setPort(int port) {
 		this.port = port;
+	}
+	
+	@Override
+	public String toString() {
+		return host + ":" + port;
 	}
 	
 	
