@@ -5,7 +5,7 @@ import org.crawler.imp.Page;
 /**
  * Zdarzenia zwrotne crawlerow 
  * @author Marcin
- * test
+ * 
  */
 public interface ICrawlingCallback<T extends Page<?>> {
 	
