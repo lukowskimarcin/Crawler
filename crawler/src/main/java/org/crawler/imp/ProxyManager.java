@@ -1,8 +1,12 @@
 package org.crawler.imp;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URL;
@@ -10,8 +14,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.commons.lang.NotImplementedException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Klasa zarządzająca proxy
@@ -19,11 +23,14 @@ import org.apache.commons.lang.NotImplementedException;
  *
  */
 public class ProxyManager {
+	private static final Logger log = Logger.getLogger(ProxyManager.class.getName());   
+	private static final int CONNECTION_TIMEOUT = 1000; //1s napolaczenie
+	
 	private List<Proxy> proxies = new ArrayList<Proxy>();
 	
 	
 	public ProxyManager() {
-		
+		log.setLevel(Level.ALL);
 	}
 	
 	public ProxyManager(List<Proxy> list) {
@@ -35,6 +42,7 @@ public class ProxyManager {
 	}
 	
 	public void addProxy(Proxy proxy) {
+		log.info("add: " +proxy);
 		proxies.add(proxy);
 	}
 	
@@ -64,39 +72,35 @@ public class ProxyManager {
 		return getProxy(index);
 	}
 	
+	public boolean testProxy(Proxy proxy){
+		try {
+			String proxyHost = proxy.getHost();
+			int proxyPort = proxy.getPort();
+			SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
+			java.net.Proxy httpProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, addr);
+			
+			URLConnection urlConn = null;
+			URL url = new URL("https://www.google.pl");
+			urlConn = url.openConnection(httpProxy);
+			urlConn.setConnectTimeout(CONNECTION_TIMEOUT);
+			urlConn.connect();
+			
+			log.info(proxy + " SUCCES");
+		}	catch (Exception ex) {
+			log.info(proxy + " FAIL : " + ex.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Metoda testuje czy proxy są aktywne.
 	 * Automatycznie usuwa nieaktywne
 	 */
 	public void testProxies() {
-		
 		List<Proxy> toRemove = new ArrayList<Proxy>();
 		for(Proxy proxy : proxies) {
-			try {
-				String proxyHost = proxy.getHost();
-				int proxyPort = proxy.getPort();
-				SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
-				java.net.Proxy httpProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, addr);
-				
-				URLConnection urlConn = null;
-				BufferedReader reader = null;
-				String response = "";
-				String output = "";
-				URL url = new URL("https://www.google.pl");
-				//Pass the Proxy instance defined above, to the openConnection() method
-				urlConn = url.openConnection(httpProxy); 
-				
-				urlConn.connect();
-				reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
-				response = reader.readLine();
-				while (response!=null) {
-				    output+= response;
-				    response = reader.readLine();
-				}   
-				System.out.println("Output: " + output);
-				
-			}	catch (Exception ex) {
-				ex.printStackTrace();
+			if(!testProxy(proxy)) {
 				toRemove.add(proxy);
 			}
 		}
@@ -109,8 +113,24 @@ public class ProxyManager {
 	 * @param filePath : ściezka do pliku
 	 */
 	public void loadProxies(String filePath) {
-		testProxies();
-		throw new NotImplementedException(); 
+		try {
+			File file = new File(filePath);
+			FileInputStream fis = new FileInputStream(file);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				if(line.length()>0) {
+					String[] ip = line.split(":");
+					addProxy(new Proxy(ip[0], Integer.parseInt(ip[1])));
+				}
+			}
+
+			br.close();
+		} catch (Exception ex) {
+			log.log(Level.SEVERE, "loadProxies : " + filePath, ex);
+		}
+
 	}
 	
 	/**
@@ -120,22 +140,31 @@ public class ProxyManager {
 	 * @return
 	 */
 	public File saveProxies(String filePath) {
-		throw new NotImplementedException(); 
+		try {
+			File fout = new File(filePath);
+			FileOutputStream fos = new FileOutputStream(fout);
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+	 
+			for(Proxy proxy : proxies) {
+				bw.write(proxy.toString());
+				bw.newLine();
+			}
+			bw.flush();
+			bw.close();
+		
+			return fout;
+		}catch (Exception ex) {
+			log.log(Level.SEVERE, "saveProxies : " + filePath, ex);
+			return null;
+		}
 	}	
-	
-	
-	
 	
 	public static void main(String[] args) {
 		//Lista proxy : http://prx.centrump2p.com/
-		
-		ProxyManager manager = new ProxyManager();
-		manager.addProxy(new Proxy("87.98.239.19", 80)); //OK
-		manager.addProxy(new Proxy("87.98.239.192", 820));
-		
+		//http://proxylist.hidemyass.com/6#listable
+		ProxyManager manager = new ProxyManager("E:/proxy.txt");
 		manager.testProxies();
-		
+		manager.saveProxies("E:/checkedProxy.txt");
 	}
 	 
-
 }
