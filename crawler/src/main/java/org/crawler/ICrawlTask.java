@@ -26,7 +26,7 @@ public interface ICrawlTask<T extends Page<?>> extends Callable<T> {
 	/**
 	 * Metoda przetwarzająca stronę
 	 */
-	void parsePage();
+	void parsePage() throws Exception;
 	
 	/**
 	 * Metoda zwraca sotrone zgloszona do zadania

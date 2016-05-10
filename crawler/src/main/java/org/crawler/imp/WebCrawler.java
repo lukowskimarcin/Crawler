@@ -3,7 +3,6 @@ package org.crawler.imp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -33,7 +32,15 @@ public class WebCrawler<T extends Page<?>> implements IWebCrawler<T>  {
 	
 	public WebCrawler( ) {
 		pool =  Executors.newFixedThreadPool(20);
+		
+		
 	}
+	
+	
+	public void shutdown() {
+		pool.shutdown();
+	}
+	
 	
 	/**
 	 * Tworzy Managera z zdefiniowanym obserwatorem

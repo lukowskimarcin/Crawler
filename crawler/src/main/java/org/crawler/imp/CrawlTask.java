@@ -2,6 +2,8 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.crawler.ICrawlTask;
 import org.crawler.ICrawlingCallback;
@@ -13,6 +15,8 @@ import org.crawler.IWebCrawler;
  * @param <TPage> Typ obslugiwanej strony
  */
 public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
+	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
+	
 	private List<ICrawlingCallback<T>> callbacks;
 	
 	protected IWebCrawler<T> webCrawler;
@@ -27,7 +31,7 @@ public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 		addCrawlingListener(listener);
 	}
 	 
-	public abstract void parsePage();
+	public abstract void parsePage() throws Exception;
 	
 	public void init(IWebCrawler<T> webCrawler) {
 		this.webCrawler = webCrawler;
@@ -75,6 +79,7 @@ public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 	}
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
+		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {

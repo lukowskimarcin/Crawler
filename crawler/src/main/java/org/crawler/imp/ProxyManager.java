@@ -163,6 +163,9 @@ public class ProxyManager {
 		//Lista proxy : http://prx.centrump2p.com/
 		//http://proxylist.hidemyass.com/6#listable
 		ProxyManager manager = new ProxyManager("E:/proxy.txt");
+		
+		manager.addProxy(new Proxy("112.5.220.199", 80));
+		
 		manager.testProxies();
 		manager.saveProxies("E:/checkedProxy.txt");
 	}
