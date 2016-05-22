@@ -44,6 +44,8 @@ public class WebCrawler<T extends PageWrapper<?>> implements IWebCrawler<T>  {
 	public void shutdown() {
 		pool.shutdown();
 		
+		
+		
 //		// the default `commonPool` should be sufficient for many cases.
 //	    ForkJoinPool pool = ForkJoinPool.commonPool(); 
 //	    // The root of your task that may spawn other tasks. 

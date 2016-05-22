@@ -47,7 +47,9 @@ public class Main {
 		proxyWebCrawler.submitCrawlTask(new ProxyCentrumCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"))  );
 		
 		
-		 
+		 //TODO
+		//- uzyc fork jon z recursivetask
+		// na puli  pool.awaitQuiescence(...); żeby czekalo az glowny taks i pod taski sie zakoncza
 		
 		
 		
