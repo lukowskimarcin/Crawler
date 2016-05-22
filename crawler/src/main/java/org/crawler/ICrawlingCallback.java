@@ -1,13 +1,13 @@
 package org.crawler;
 
-import org.crawler.imp.Page;
+import org.crawler.imp.PageWrapper;
 
 /**
  * Zdarzenia zwrotne crawlerow 
  * @author Marcin
  * 
  */
-public interface ICrawlingCallback<T extends Page<?>> {
+public interface ICrawlingCallback<T extends PageWrapper<?>> {
 	
 	/**
 	 * Zdarzenie rozpoczecia przetwarzania strony
@@ -22,6 +22,7 @@ public interface ICrawlingCallback<T extends Page<?>> {
 	 * @param page
 	 */
 	void onPageCrawlingCompleted(ICrawlTask<T> crawler, T page);
+	
 	
 	/**
 	 * Zdarzenie błędu przetwarzania strony

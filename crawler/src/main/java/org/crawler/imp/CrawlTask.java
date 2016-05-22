@@ -14,7 +14,7 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
+public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<T>   {
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
 	private List<ICrawlingCallback<T>> callbacks;
@@ -58,7 +58,9 @@ public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
-		return null;
+		
+		webCrawler.isAllTaskComplete();
+		return page;
 	}
 	 
 	public void addCrawlingListener(ICrawlingCallback<T> listener) {
@@ -73,9 +75,19 @@ public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
+		if(callbacks!=null) {
+			for(ICrawlingCallback<T> callback : callbacks){
+				callback.onPageCrawlingStart(this, page);
+			}
+		}
 	}
 	
 	protected void fireOnPageCrawlingCompletedEvent(){
+		if(callbacks!=null) {
+			for(ICrawlingCallback<T> callback : callbacks){
+				callback.onPageCrawlingCompleted(this, page);
+			}
+		}
 	}
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
@@ -83,6 +95,11 @@ public abstract class CrawlTask<T extends Page<?>> implements ICrawlTask<T>   {
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {
+		if(callbacks!=null) {
+			for(ICrawlingCallback<T> callback : callbacks){
+				callback.onAlreadyVisited(this, page);
+			}
+		}
 	}
 
 	protected void fireOnPageProcessingProgressEvent() {

@@ -1,8 +1,11 @@
 package org.crawler;
 
-import org.crawler.imp.Page;
+import java.util.List;
+import java.util.concurrent.Future;
 
-public interface IWebCrawler<T extends Page<?>> {
+import org.crawler.imp.PageWrapper;
+
+public interface IWebCrawler<T extends PageWrapper<?>> {
 
 	/**
 	 * Metoda Sprawdza czy strona byla przetwarzana
@@ -33,9 +36,14 @@ public interface IWebCrawler<T extends Page<?>> {
 	ICrawlingCallback<T> getCrawlingListener();
 	
 	
+	List<Future<T>> getPagesTask();
 	
 	void shutdown();
-
 	
+	
+	boolean isAllTaskComplete();
+	
+	
+	void onAllTaskComplete();
 	
 }

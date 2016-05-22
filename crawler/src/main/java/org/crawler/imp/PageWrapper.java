@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  * @param <T> typ danych pobierany dla strony
  */
-public class Page<T> implements Serializable {
+public class PageWrapper<T> implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
 	private String url;
@@ -16,18 +16,18 @@ public class Page<T> implements Serializable {
 	private int level;
 	private T data;
 	
-	public Page(String url) {
+	public PageWrapper(String url) {
 		this(url, 0);
 	}
 	
-	public Page(String url, int level) {
+	public PageWrapper(String url, int level) {
 		this.url = url;
 		this.level = level;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		Page<?> second = (Page<?>) obj;
+		PageWrapper<?> second = (PageWrapper<?>) obj;
 		return  url.equals(second.getUrl());
 	}
 	
@@ -61,5 +61,4 @@ public class Page<T> implements Serializable {
 	public void setLevel(int level) {
 		this.level = level;
 	}
-
 }

@@ -2,14 +2,14 @@ package org.crawler;
 
 import java.util.concurrent.Callable;
 
-import org.crawler.imp.Page;
+import org.crawler.imp.PageWrapper;
 
 /**
  * Interfejs crawlera
  * @author Marcin
  *
  */
-public interface ICrawlTask<T extends Page<?>> extends Callable<T> {
+public interface ICrawlTask<T extends PageWrapper<?>> extends Callable<T> {
 	
 	/**
 	 * Metoda inicjuje zadanie do wykonania
