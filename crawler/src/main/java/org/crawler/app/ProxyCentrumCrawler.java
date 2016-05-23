@@ -14,8 +14,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class ProxyCentrumCrawler extends CrawlTask<PageWrapper<List<Proxy>>> {
-
+public class ProxyCentrumCrawler extends CrawlTask<List<Proxy>> {
+	private static final long serialVersionUID = -5028690879897857829L;
+	
 	public ProxyCentrumCrawler(PageWrapper<List<Proxy>> page) {
 		super(page);
 	}
@@ -34,9 +35,9 @@ public class ProxyCentrumCrawler extends CrawlTask<PageWrapper<List<Proxy>>> {
 				
 				if(href.matches(".*/[0-9]+")) {
 					String url = "http://prx.centrump2p.com" + href;
-					PageWrapper<List<Proxy>> nextPage = new PageWrapper<>(url);
+					PageWrapper<List<Proxy>> nextPage = new PageWrapper<List<Proxy>>(url, page.getLevel()+1);
 					ProxyCentrumCrawler task = new ProxyCentrumCrawler(nextPage);
-					this.webCrawler.submitCrawlTask(task);
+					webCrawler.addTask(task); 
 				}
 			}catch (Exception ex) {
 				System.out.println(ex);

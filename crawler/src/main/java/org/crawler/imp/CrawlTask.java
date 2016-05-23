@@ -2,6 +2,8 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,19 +16,21 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<T>   {
+public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTask<T>   {
+	private static final long serialVersionUID = -1936115110237484455L;
+
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
 	private List<ICrawlingCallback<T>> callbacks;
 	
 	protected IWebCrawler<T> webCrawler;
-	protected T page;
+	protected PageWrapper<T> page;
 	
-	public CrawlTask(T page) {
+	public CrawlTask(PageWrapper<T> page) {
 		this.page = page;
 	}
 	
-	public CrawlTask(T page, ICrawlingCallback<T> listener) {
+	public CrawlTask(PageWrapper<T> page, ICrawlingCallback<T> listener) {
 		this(page);
 		addCrawlingListener(listener);
 	}
@@ -41,7 +45,8 @@ public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<
 		}
 	}
 	
-	public T call() throws Exception {
+	@Override
+	protected void compute()  {
 		try {
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
@@ -59,8 +64,6 @@ public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<
 			fireOnPageCrawlingFailedEvent(ex);
 		}
 		
-		webCrawler.isAllTaskComplete();
-		return page;
 	}
 	 
 	public void addCrawlingListener(ICrawlingCallback<T> listener) {
@@ -70,7 +73,7 @@ public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<
 		callbacks.add(listener);
 	}
 	
-	public T getPage() { 
+	public PageWrapper<T> getPage() { 
 		return page;
 	}
 	
@@ -83,6 +86,7 @@ public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<
 	}
 	
 	protected void fireOnPageCrawlingCompletedEvent(){
+		webCrawler.addCompletePage(page);
 		if(callbacks!=null) {
 			for(ICrawlingCallback<T> callback : callbacks){
 				callback.onPageCrawlingCompleted(this, page);
@@ -104,9 +108,5 @@ public abstract class CrawlTask<T extends PageWrapper<?>> implements ICrawlTask<
 
 	protected void fireOnPageProcessingProgressEvent() {
 	}
-
-	
-	
- 
 	
 }

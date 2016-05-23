@@ -1,33 +1,37 @@
 package org.crawler;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
+import org.crawler.imp.CrawlTask;
 import org.crawler.imp.PageWrapper;
 
-public interface IWebCrawler<T extends PageWrapper<?>> {
+public interface IWebCrawler<T> {
 
 	/**
 	 * Metoda Sprawdza czy strona byla przetwarzana
 	 * @param page
 	 * @return
 	 */
-	boolean isVisited(T page);
-	
+	boolean isVisited(PageWrapper<T> page);
 	
 	/**
 	 * Metoda oznacza stronę jako przetworzoną
 	 * @param page
 	 */
-	void addVisited(T page);
+	void addVisited(PageWrapper<T> page);
 	
+	/**
+	 * Start przetwarzania 
+	 * @param rootTask : początkowa strona do przetwarzania
+	 * @return
+	 */
+	boolean start(CrawlTask<T> rootTask);
 	
 	/**
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
-	void submitCrawlTask(ICrawlTask<T> task);
-	
+	void addTask(CrawlTask<T> task);
 	
 	/**
 	 * Metoda zwraca globalnego obserwatora zdarzeń
@@ -35,15 +39,9 @@ public interface IWebCrawler<T extends PageWrapper<?>> {
 	 */
 	ICrawlingCallback<T> getCrawlingListener();
 	
-	
-	List<Future<T>> getPagesTask();
-	
 	void shutdown();
 	
+	void addCompletePage(PageWrapper<T> page);
 	
-	boolean isAllTaskComplete();
-	
-	
-	void onAllTaskComplete();
-	
+	List<PageWrapper<T>> getCompletePage();
 }

@@ -1,6 +1,5 @@
 package org.crawler.app;
 
-import java.util.List;
 
 import org.crawler.imp.CrawlTask;
 import org.crawler.imp.PageWrapper;
@@ -13,11 +12,14 @@ import com.gargoylesoftware.htmlunit.html.HtmlTable;
 
 
 //http://proxylist.hidemyass.com/6#listable
-public class HideMyAssCrawler extends CrawlTask<PageWrapper<Proxy>> {
-
+public class HideMyAssCrawler extends CrawlTask<Proxy> {
+	
+	
 	public HideMyAssCrawler(PageWrapper<Proxy> page) {
 		super(page);
 	}
+
+	private static final long serialVersionUID = -8884778544170508208L;
 
 	@Override
 	public void parsePage() throws Exception {

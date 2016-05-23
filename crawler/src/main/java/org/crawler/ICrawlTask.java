@@ -1,7 +1,5 @@
 package org.crawler;
 
-import java.util.concurrent.Callable;
-
 import org.crawler.imp.PageWrapper;
 
 /**
@@ -9,7 +7,7 @@ import org.crawler.imp.PageWrapper;
  * @author Marcin
  *
  */
-public interface ICrawlTask<T extends PageWrapper<?>> extends Callable<T> {
+public interface ICrawlTask<T>   {
 	
 	/**
 	 * Metoda inicjuje zadanie do wykonania
@@ -32,5 +30,5 @@ public interface ICrawlTask<T extends PageWrapper<?>> extends Callable<T> {
 	 * Metoda zwraca sotrone zgloszona do zadania
 	 * @return
 	 */
-	T getPage();
+	PageWrapper<T> getPage();
 }
