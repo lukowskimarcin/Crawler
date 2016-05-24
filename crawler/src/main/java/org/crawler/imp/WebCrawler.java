@@ -6,7 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 
 import org.crawler.ICrawlingCallback;
@@ -30,11 +33,14 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	
 	private ProxyManager proxyManager;
 	
-	private ForkJoinPool pool;
+	private ExecutorService pool;
+	
+	private final Phaser phaser = new Phaser();
 	
 	
 	public WebCrawler( ) {
-		pool =  new ForkJoinPool();
+		phaser.register();
+		pool =  Executors.newFixedThreadPool(10);
 	}
 	
 	public void shutdown() {
@@ -46,7 +52,8 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	 * @param callback : obserwator zdarzeń
 	 */
 	public WebCrawler(ICrawlingCallback<T> callback) {
-		pool =  new ForkJoinPool();
+		phaser.register();
+		pool =  Executors.newFixedThreadPool(10);
 		this.callback = callback;
 	}
 	
@@ -55,14 +62,18 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	}
 	
 	public void addTask(CrawlTask<T> task) {
-		task.init(this);
-		pool.invoke(task); 
+		task.init(this, phaser);
+		pool.submit(task);
 	}
 	
 	@Override
-	public boolean start(CrawlTask<T> rootTask) {
+	public void start(CrawlTask<T> rootTask, boolean block) {
 		addTask(rootTask);
-		return pool.awaitQuiescence(120, TimeUnit.SECONDS);
+		
+		//Pętla po zadaniach czy zakończone-
+		
+		
+		phaser.arriveAndAwaitAdvance();
 	}
 	
 	public boolean isVisited(PageWrapper<T> page) {

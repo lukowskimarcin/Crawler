@@ -25,6 +25,8 @@ public class ProxyCentrumCrawler extends CrawlTask<List<Proxy>> {
 	public void parsePage() throws Exception {
 		WebClient webClient = new WebClient(BrowserVersion.CHROME);
 		webClient.getOptions().setThrowExceptionOnScriptError(false);
+		webClient.getOptions().setCssEnabled(false);
+
 		HtmlPage htmlPage = webClient.getPage(page.getUrl());
 		
 		HtmlDivision pager = (HtmlDivision) htmlPage.getElementById("pager");

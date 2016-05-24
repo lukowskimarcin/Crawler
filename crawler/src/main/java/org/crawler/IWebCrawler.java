@@ -23,9 +23,10 @@ public interface IWebCrawler<T> {
 	/**
 	 * Start przetwarzania 
 	 * @param rootTask : początkowa strona do przetwarzania
+	 * @param block : czy blokować przetwarzanie
 	 * @return
 	 */
-	boolean start(CrawlTask<T> rootTask);
+	void start(CrawlTask<T> rootTask, boolean block);
 	
 	/**
 	 * Metoda przekazuje zadanie do puli do wykonania

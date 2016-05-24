@@ -2,6 +2,7 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 import java.util.logging.Level;
@@ -16,12 +17,14 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTask<T>   {
+public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	private static final long serialVersionUID = -1936115110237484455L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
 	private List<ICrawlingCallback<T>> callbacks;
+	
+	private Phaser phaser = null;
 	
 	protected IWebCrawler<T> webCrawler;
 	protected PageWrapper<T> page;
@@ -37,8 +40,10 @@ public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTas
 	 
 	public abstract void parsePage() throws Exception;
 	
-	public void init(IWebCrawler<T> webCrawler) {
+	public void init(IWebCrawler<T> webCrawler, Phaser phaser) {
 		this.webCrawler = webCrawler;
+		this.phaser = phaser;
+		
 		ICrawlingCallback<T> callback = webCrawler.getCrawlingListener();
 		if(callback!=null) {
 			addCrawlingListener(callback);
@@ -46,7 +51,9 @@ public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTas
 	}
 	
 	@Override
-	protected void compute()  {
+	public T call() throws Exception {
+		int y = phaser.register();
+		System.out.println("register: " + y);
 		try {
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
@@ -63,7 +70,11 @@ public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTas
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
-		
+		finally {
+			int x = phaser.arriveAndAwaitAdvance();
+			System.out.println("arriveAndAwaitAdvance: " + x);
+		}
+		return page.getData();
 	}
 	 
 	public void addCrawlingListener(ICrawlingCallback<T> listener) {
@@ -78,6 +89,7 @@ public abstract class CrawlTask<T> extends RecursiveAction  implements ICrawlTas
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
+		
 		if(callbacks!=null) {
 			for(ICrawlingCallback<T> callback : callbacks){
 				callback.onPageCrawlingStart(this, page);
