@@ -1,7 +1,7 @@
 package org.crawler;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.crawler.imp.PageWrapper;
 
@@ -16,7 +16,7 @@ public interface ICrawlTask<T> extends Callable<T>   {
 	 * Metoda inicjuje zadanie do wykonania
 	 * @param webCrawler crawler, który ma wykonać zadanie
 	 */
-	void init(IWebCrawler<T> webCrawler, Phaser phaser);
+	void init(IWebCrawler<T> webCrawler, AtomicInteger counter);
 	
 	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera

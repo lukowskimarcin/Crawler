@@ -52,7 +52,9 @@ public class Main {
 		ProxyCentrumCrawler rootTask = new ProxyCentrumCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"));
 		proxyWebCrawler.start(rootTask, true);
 		
+		proxyWebCrawler.shutdownAndAwaitTermination();		
 		System.out.println("END");
+		
 //		
 //		List<PageWrapper<List<Proxy>>> list  = proxyWebCrawler.getCompletePage();
 //		if(list != null) {

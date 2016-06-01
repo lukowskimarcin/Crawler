@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,7 +25,7 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	
 	private List<ICrawlingCallback<T>> callbacks;
 	
-	private Phaser phaser = null;
+	private AtomicInteger counter;
 	
 	protected IWebCrawler<T> webCrawler;
 	protected PageWrapper<T> page;
@@ -40,9 +41,9 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	 
 	public abstract void parsePage() throws Exception;
 	
-	public void init(IWebCrawler<T> webCrawler, Phaser phaser) {
+	public void init(IWebCrawler<T> webCrawler, AtomicInteger counter) {
 		this.webCrawler = webCrawler;
-		this.phaser = phaser;
+		this.counter = counter;
 		
 		ICrawlingCallback<T> callback = webCrawler.getCrawlingListener();
 		if(callback!=null) {
@@ -52,9 +53,8 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	
 	@Override
 	public T call() throws Exception {
-		int y = phaser.register();
-		System.out.println("register: " + y);
 		try {
+			counter.incrementAndGet();
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
 				
@@ -65,15 +65,13 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 			} else {
 				fireOnAlreadyVisitedEvent();
 			}
-		
-			
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
 		finally {
-			int x = phaser.arriveAndAwaitAdvance();
-			System.out.println("arriveAndAwaitAdvance: " + x);
+			counter.decrementAndGet();
 		}
+		
 		return page.getData();
 	}
 	 

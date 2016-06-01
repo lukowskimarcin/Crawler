@@ -6,12 +6,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.xml.utils.ThreadControllerWrapper;
 import org.crawler.ICrawlingCallback;
 import org.crawler.IWebCrawler;
 
@@ -35,16 +39,11 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	
 	private ExecutorService pool;
 	
-	private final Phaser phaser = new Phaser();
-	
+	private AtomicInteger counter;
 	
 	public WebCrawler( ) {
-		phaser.register();
 		pool =  Executors.newFixedThreadPool(10);
-	}
-	
-	public void shutdown() {
-		pool.shutdown();
+		counter = new AtomicInteger(0);
 	}
 	
 	/**
@@ -52,51 +51,59 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	 * @param callback : obserwator zdarzeń
 	 */
 	public WebCrawler(ICrawlingCallback<T> callback) {
-		phaser.register();
 		pool =  Executors.newFixedThreadPool(10);
+		counter = new AtomicInteger(0);
 		this.callback = callback;
 	}
+	
+	public void shutdown() {
+		pool.shutdown();
+	}
+	
+	public void shutdownAndAwaitTermination() {
+		pool.shutdown(); // Disable new tasks from being submitted
+		try {
+			// Wait a while for existing tasks to terminate
+			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+				pool.shutdownNow(); // Cancel currently executing tasks
+				// Wait a while for tasks to respond to being cancelled
+				if (!pool.awaitTermination(60, TimeUnit.SECONDS))
+					System.err.println("Pool did not terminate");
+			}
+		} catch (InterruptedException ie) {
+			// (Re-)Cancel if current thread also interrupted
+			pool.shutdownNow();
+			// Preserve interrupt status
+			Thread.currentThread().interrupt();
+		}
+	}
+	
+	
+	
 	
 	public ICrawlingCallback<T> getCrawlingListener() {
 		return callback;
 	}
 	
 	public void addTask(CrawlTask<T> task) {
-		task.init(this, phaser);
-		pool.submit(task);
+		task.init(this, counter);
+		Future<T> future = pool.submit(task);
 	}
 	
 	@Override
 	public void start(CrawlTask<T> rootTask, boolean block) {
 		addTask(rootTask);
 		
-		//Pętla po zadaniach czy zakończone-
-		
-		 
-		
-		
-		
-		
-		phaser.arriveAndAwaitAdvance();
-	}
-	
-	void shutdownAndAwaitTermination(ExecutorService pool) {
-		   pool.shutdown(); // Disable new tasks from being submitted
-		   try {
-		   // Wait a while for existing tasks to terminate
-		   if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
-		       pool.shutdownNow(); // Cancel currently executing tasks
-		       // Wait a while for tasks to respond to being cancelled
-		       if (!pool.awaitTermination(60, TimeUnit.SECONDS))
-		       System.err.println("Pool did not terminate");
-		   }
-		} catch (InterruptedException ie) {
-		     // (Re-)Cancel if current thread also interrupted
-		     pool.shutdownNow();
-		     // Preserve interrupt status
-		     Thread.currentThread().interrupt();
+		while(block && counter.get() > 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
+	
+	
 	
 	public boolean isVisited(PageWrapper<T> page) {
 		boolean result = visitedPages.contains(page.getUrl());

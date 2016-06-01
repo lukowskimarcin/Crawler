@@ -42,6 +42,8 @@ public interface IWebCrawler<T> {
 	
 	void shutdown();
 	
+	void shutdownAndAwaitTermination(); 
+	
 	void addCompletePage(PageWrapper<T> page);
 	
 	List<PageWrapper<T>> getCompletePage();
