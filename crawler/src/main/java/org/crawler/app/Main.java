@@ -45,6 +45,12 @@ public class Main {
 					int percent) {
 				// TODO Auto-generated method stub
 			}
+			
+			@Override
+			public void onCrawlingCompleted() {
+				System.out.println("All pages crawled !!!");
+				
+			}
 		};  
 		
 		IWebCrawler<List<Proxy>> proxyWebCrawler = new WebCrawler<List<Proxy>>(callback);
@@ -52,7 +58,8 @@ public class Main {
 		ProxyCentrumCrawler rootTask = new ProxyCentrumCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"));
 		proxyWebCrawler.start(rootTask, true);
 		
-		proxyWebCrawler.shutdownAndAwaitTermination();		
+		
+		//proxyWebCrawler.shutdownAndAwaitTermination();		
 		System.out.println("END");
 		
 //		

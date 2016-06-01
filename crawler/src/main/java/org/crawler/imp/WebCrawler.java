@@ -78,9 +78,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		}
 	}
 	
-	
-	
-	
 	public ICrawlingCallback<T> getCrawlingListener() {
 		return callback;
 	}
@@ -92,15 +89,20 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	
 	@Override
 	public void start(CrawlTask<T> rootTask, boolean block) {
-		addTask(rootTask);
-		
-		while(block && counter.get() > 0) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		rootTask.init(this, counter);
+		Future<T> future = pool.submit(rootTask);
+		try {
+			if(block) {
+				future.get();
 			}
+			
+			while(block && counter.get() > 0) {
+				Thread.sleep(1000);
+			}
+		} catch (InterruptedException | ExecutionException e1) {
+			e1.printStackTrace();
 		}
+		System.out.println("END START");
 	}
 	
 	

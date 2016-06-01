@@ -2,9 +2,6 @@ package org.crawler.imp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +16,6 @@ import org.crawler.IWebCrawler;
  * @param <TPage> Typ obslugiwanej strony
  */
 public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
-	private static final long serialVersionUID = -1936115110237484455L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
@@ -69,7 +65,10 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
 		finally {
-			counter.decrementAndGet();
+			int res = counter.decrementAndGet();
+			if (res<=0) {
+				fireOnCrawlingCompletedEvent();
+			}
 		}
 		
 		return page.getData();
@@ -118,5 +117,17 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 
 	protected void fireOnPageProcessingProgressEvent() {
 	}
+	
+	protected void fireOnCrawlingCompletedEvent() {
+		if(callbacks!=null) {
+			for(ICrawlingCallback<T> callback : callbacks){
+				callback.onCrawlingCompleted();
+			}
+		}
+		
+		webCrawler.shutdown();
+	}
+	
+	
 	
 }

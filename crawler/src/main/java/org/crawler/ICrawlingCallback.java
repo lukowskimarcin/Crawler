@@ -46,4 +46,7 @@ public interface ICrawlingCallback<T> {
 	 */
 	void onPageProcessingProgress(ICrawlTask<T> crawler, PageWrapper<T> page, int percent);
 	
+	
+	void onCrawlingCompleted();
+	
 }
