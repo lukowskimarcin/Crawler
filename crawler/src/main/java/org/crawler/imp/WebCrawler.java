@@ -29,15 +29,19 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	//Strony już przetworzone
 	private final Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
 	 
-	private List<PageWrapper<T>> errorPages = new ArrayList<PageWrapper<T>>();
+	private final List<PageWrapper<T>> errorPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
 	private final List<PageWrapper<T>> completePages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	
+	private final List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
 	private ICrawlingCallback<T> callback;
 	
 	private ProxyManager proxyManager;
 	
 	private ExecutorService pool;
+	
+//	private Object lock = new Object();
 	
 	private AtomicInteger counter;
 	
@@ -92,19 +96,24 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		rootTask.init(this, counter);
 		Future<T> future = pool.submit(rootTask);
 		try {
+//			if(block) {
+//				future.get();
+//			}
+			
 			if(block) {
-				future.get();
+				synchronized (this) {
+					this.wait();
+				}
 			}
 			
-			while(block && counter.get() > 0) {
-				Thread.sleep(1000);
-			}
-		} catch (InterruptedException | ExecutionException e1) {
+//			while(block && counter.get() > 0) {
+//				Thread.sleep(1000);
+//			}
+		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		System.out.println("END START");
 	}
-	
 	
 	
 	public boolean isVisited(PageWrapper<T> page) {
@@ -116,21 +125,7 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		visitedPages.add(page.getUrl());
 	}
 	
-	/**
-	 * Dodaje błędnie przetworzoną stronę
-	 * @param page : strona
-	 */
-	public synchronized void addErrorPage(PageWrapper<T> page) {
-		errorPages.add(page);
-	}
 	
-	/**
-	 * Lista błędnie przetworzonych stron
-	 * @return
-	 */
-	public List<PageWrapper<T>> getErrorPages(){
-		return errorPages;
-	}
 	
 	public ProxyManager getProxyManager() {
 		return proxyManager;
@@ -144,12 +139,35 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		return callback;
 	}
 	
+	public synchronized void addErrorPage(PageWrapper<T> page) {
+		processingPages.remove(page);
+		errorPages.add(page);
+	}
+	
+	@Override
+	public List<PageWrapper<T>> getErrorPages(){
+		return errorPages;
+	}
+	
 	public synchronized void addCompletePage(PageWrapper<T> page) {
+		processingPages.remove(page);
 		completePages.add(page);
 	}
 	
 	@Override
-	public List<PageWrapper<T>> getCompletePage() {
+	public List<PageWrapper<T>> getCompletePages() {
 		return completePages;
 	}
+
+	public synchronized void addProcessingPage(PageWrapper<T> page) {
+		processingPages.add(page);
+	}
+	
+	@Override
+	public List<PageWrapper<T>> getProcesingPages() {
+		return processingPages;
+	}
+	
+	
+	
 }

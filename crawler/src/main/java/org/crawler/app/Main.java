@@ -47,7 +47,7 @@ public class Main {
 			}
 			
 			@Override
-			public void onCrawlingCompleted() {
+			public void onCrawlingFinished() {
 				System.out.println("All pages crawled !!!");
 				
 			}
@@ -61,6 +61,11 @@ public class Main {
 		
 		//proxyWebCrawler.shutdownAndAwaitTermination();		
 		System.out.println("END");
+		
+		 System.out.println("Errors: " + proxyWebCrawler.getErrorPages().size());
+		 System.out.println("Processing: " + proxyWebCrawler.getProcesingPages().size());
+		 System.out.println("Completed: " + proxyWebCrawler.getCompletePages().size());
+		
 		
 //		
 //		List<PageWrapper<List<Proxy>>> list  = proxyWebCrawler.getCompletePage();

@@ -46,5 +46,13 @@ public interface IWebCrawler<T> {
 	
 	void addCompletePage(PageWrapper<T> page);
 	
-	List<PageWrapper<T>> getCompletePage();
+	void addProcessingPage(PageWrapper<T> page);
+	
+	void addErrorPage(PageWrapper<T> page);
+	
+	List<PageWrapper<T>> getCompletePages();
+	
+	List<PageWrapper<T>> getErrorPages();
+	
+	List<PageWrapper<T>> getProcesingPages();
 }

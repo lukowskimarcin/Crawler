@@ -23,6 +23,8 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	
 	private AtomicInteger counter;
 	
+	
+	
 	protected IWebCrawler<T> webCrawler;
 	protected PageWrapper<T> page;
 	
@@ -67,10 +69,9 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 		finally {
 			int res = counter.decrementAndGet();
 			if (res<=0) {
-				fireOnCrawlingCompletedEvent();
+				fireOnCrawlingFinishedEvent();
 			}
 		}
-		
 		return page.getData();
 	}
 	 
@@ -86,7 +87,7 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
-		
+		webCrawler.addProcessingPage(page);
 		if(callbacks!=null) {
 			for(ICrawlingCallback<T> callback : callbacks){
 				callback.onPageCrawlingStart(this, page);
@@ -105,6 +106,7 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
 		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);
+		webCrawler.addErrorPage(page);
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {
@@ -118,13 +120,16 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	protected void fireOnPageProcessingProgressEvent() {
 	}
 	
-	protected void fireOnCrawlingCompletedEvent() {
+	protected void fireOnCrawlingFinishedEvent() {
 		if(callbacks!=null) {
 			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onCrawlingCompleted();
+				callback.onCrawlingFinished();
 			}
 		}
 		
+		synchronized (webCrawler) {
+			webCrawler.notifyAll();	
+		}
 		webCrawler.shutdown();
 	}
 	
