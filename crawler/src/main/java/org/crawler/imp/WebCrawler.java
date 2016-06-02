@@ -14,6 +14,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.xml.utils.ThreadControllerWrapper;
 import org.crawler.ICrawlingCallback;
@@ -25,6 +27,8 @@ import org.crawler.IWebCrawler;
  *
  */
 public class WebCrawler<T> implements IWebCrawler<T>   {
+	
+	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
 	//Strony już przetworzone
 	private final Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
@@ -92,27 +96,32 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	}
 	
 	@Override
-	public void start(CrawlTask<T> rootTask, boolean block) {
+	public void start(CrawlTask<T> rootTask) {
 		rootTask.init(this, counter);
 		Future<T> future = pool.submit(rootTask);
+	}
+	
+	@Override
+	public void start(java.util.Collection<org.crawler.imp.CrawlTask<T>> tasks){
 		try {
-//			if(block) {
-//				future.get();
-//			}
-			
-			if(block) {
-				synchronized (this) {
-					this.wait();
-				}
+			for(CrawlTask<T> task : tasks) {
+				task.init(this, counter);
 			}
-			
-//			while(block && counter.get() > 0) {
-//				Thread.sleep(1000);
-//			}
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+			pool.invokeAll(tasks);
+		} catch (InterruptedException ex) {
+			log.log(Level.SEVERE, "start", ex);
 		}
-		System.out.println("END START");
+	}
+	
+	@Override
+	public void waitUntilFinish() {
+		try {
+			synchronized (this) {
+				this.wait();
+			}
+		} catch (InterruptedException ex) {
+			log.log(Level.SEVERE, "waitUntilFinish", ex);
+		}
 	}
 	
 	
@@ -124,8 +133,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	public synchronized void addVisited(PageWrapper<T> page) {
 		visitedPages.add(page.getUrl());
 	}
-	
-	
 	
 	public ProxyManager getProxyManager() {
 		return proxyManager;
@@ -167,7 +174,5 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	public List<PageWrapper<T>> getProcesingPages() {
 		return processingPages;
 	}
-	
-	
 	
 }

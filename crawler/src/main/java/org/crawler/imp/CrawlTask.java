@@ -23,8 +23,6 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 	
 	private AtomicInteger counter;
 	
-	
-	
 	protected IWebCrawler<T> webCrawler;
 	protected PageWrapper<T> page;
 	
@@ -117,22 +115,23 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
 		}
 	}
 
-	protected void fireOnPageProcessingProgressEvent() {
+	protected void fireOnPageProcessingProgressEvent(int percent) {
+		if(callbacks!=null) {
+			for(ICrawlingCallback<T> callback : callbacks){
+				callback.onPageProcessingProgress(this, page, percent);
+			}
+		}
 	}
 	
-	protected void fireOnCrawlingFinishedEvent() {
+	protected void fireOnCrawlingFinishedEvent() {		
+		synchronized (webCrawler) {
+			webCrawler.notifyAll();	
+		}
+		webCrawler.shutdown();
 		if(callbacks!=null) {
 			for(ICrawlingCallback<T> callback : callbacks){
 				callback.onCrawlingFinished();
 			}
 		}
-		
-		synchronized (webCrawler) {
-			webCrawler.notifyAll();	
-		}
-		webCrawler.shutdown();
 	}
-	
-	
-	
 }

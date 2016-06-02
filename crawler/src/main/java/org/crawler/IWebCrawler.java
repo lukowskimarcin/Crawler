@@ -1,5 +1,6 @@
 package org.crawler;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.crawler.imp.CrawlTask;
@@ -26,7 +27,10 @@ public interface IWebCrawler<T> {
 	 * @param block : czy blokować przetwarzanie
 	 * @return
 	 */
-	void start(CrawlTask<T> rootTask, boolean block);
+	void start(CrawlTask<T> rootTask);
+	
+	
+	void start(Collection<CrawlTask<T>> tasks);
 	
 	/**
 	 * Metoda przekazuje zadanie do puli do wykonania
@@ -55,4 +59,6 @@ public interface IWebCrawler<T> {
 	List<PageWrapper<T>> getErrorPages();
 	
 	List<PageWrapper<T>> getProcesingPages();
+	
+	void waitUntilFinish();
 }

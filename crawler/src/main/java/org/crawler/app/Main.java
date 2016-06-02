@@ -56,7 +56,10 @@ public class Main {
 		IWebCrawler<List<Proxy>> proxyWebCrawler = new WebCrawler<List<Proxy>>(callback);
 		
 		ProxyCentrumCrawler rootTask = new ProxyCentrumCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"));
-		proxyWebCrawler.start(rootTask, true);
+		proxyWebCrawler.start(rootTask);
+		
+		
+		proxyWebCrawler.waitUntilFinish();
 		
 		
 		//proxyWebCrawler.shutdownAndAwaitTermination();		
