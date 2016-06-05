@@ -14,10 +14,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class ProxyCentrumCrawler extends CrawlTask<List<Proxy>> {
+public class ProxyCentrumDetailCrawler extends CrawlTask<List<Proxy>> {
 	private static final long serialVersionUID = -5028690879897857829L;
 	
-	public ProxyCentrumCrawler(PageWrapper<List<Proxy>> page) {
+	public ProxyCentrumDetailCrawler(PageWrapper<List<Proxy>> page) {
 		super(page);
 	}
 
@@ -28,23 +28,6 @@ public class ProxyCentrumCrawler extends CrawlTask<List<Proxy>> {
 		webClient.getOptions().setCssEnabled(false);
 
 		HtmlPage htmlPage = webClient.getPage(page.getUrl());
-		
-		HtmlDivision pager = (HtmlDivision) htmlPage.getElementById("pager");
-		for(HtmlElement el : pager.getElementsByTagName("a")) {
-			try {
-				HtmlAnchor anchor = (HtmlAnchor) el;
-				String href = anchor.getHrefAttribute();
-				
-				if(href.matches(".*/[0-9]+")) {
-					String url = "http://prx.centrump2p.com" + href;
-					PageWrapper<List<Proxy>> nextPage = new PageWrapper<List<Proxy>>(url, page.getLevel()+1);
-					ProxyCentrumCrawler task = new ProxyCentrumCrawler(nextPage);
-					webCrawler.addTask(task); 
-				}
-			}catch (Exception ex) {
-				System.out.println(ex);
-			}
-		}
 		
 		List<Proxy> list = new ArrayList<Proxy>();
 		for(HtmlAnchor anchor : htmlPage.getAnchors()) {

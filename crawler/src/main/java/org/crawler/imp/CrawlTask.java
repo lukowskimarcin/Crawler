@@ -1,5 +1,6 @@
 package org.crawler.imp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +16,8 @@ import org.crawler.IWebCrawler;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T>  implements ICrawlTask<T>   {
+public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable   {
+	private static final long serialVersionUID = 148486884050800551L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	

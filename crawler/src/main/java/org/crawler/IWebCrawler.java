@@ -22,21 +22,13 @@ public interface IWebCrawler<T> {
 	void addVisited(PageWrapper<T> page);
 	
 	/**
-	 * Start przetwarzania 
-	 * @param rootTask : początkowa strona do przetwarzania
-	 * @param block : czy blokować przetwarzanie
-	 * @return
-	 */
-	void start(CrawlTask<T> rootTask);
-	
-	
-	void start(Collection<CrawlTask<T>> tasks);
-	
-	/**
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
 	void addTask(CrawlTask<T> task);
+	
+	
+	void addTask(Collection<CrawlTask<T>> tasks);
 	
 	/**
 	 * Metoda zwraca globalnego obserwatora zdarzeń
@@ -61,4 +53,8 @@ public interface IWebCrawler<T> {
 	List<PageWrapper<T>> getProcesingPages();
 	
 	void waitUntilFinish();
+	
+	
+	void cancel();
+	
 }

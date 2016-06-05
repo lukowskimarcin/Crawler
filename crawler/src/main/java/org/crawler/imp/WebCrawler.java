@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -38,6 +39,8 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	private final List<PageWrapper<T>> completePages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
 	private final List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	
+	private final List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
 	
 	private ICrawlingCallback<T> callback;
 	
@@ -90,28 +93,34 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		return callback;
 	}
 	
+	@Override
 	public void addTask(CrawlTask<T> task) {
 		task.init(this, counter);
-		Future<T> future = pool.submit(task);
+		try {
+			Future<T> future = pool.submit(task);
+			futures.add(future);
+		}catch (RejectedExecutionException ex) {
+			fireOnTaskRejected(task);
+		}
+		
 	}
 	
 	@Override
-	public void start(CrawlTask<T> rootTask) {
-		rootTask.init(this, counter);
-		Future<T> future = pool.submit(rootTask);
-	}
-	
-	@Override
-	public void start(java.util.Collection<org.crawler.imp.CrawlTask<T>> tasks){
+	public void addTask(Collection<CrawlTask<T>> tasks){
 		try {
 			for(CrawlTask<T> task : tasks) {
 				task.init(this, counter);
 			}
-			pool.invokeAll(tasks);
+			futures.addAll(pool.invokeAll(tasks));
 		} catch (InterruptedException ex) {
 			log.log(Level.SEVERE, "start", ex);
 		}
 	}
+	
+	protected void fireOnTaskRejected(CrawlTask<T> task){
+		log.log(Level.WARNING, "Task rejected: " + task.getPage().getUrl());
+	}
+	
 	
 	@Override
 	public void waitUntilFinish() {
@@ -122,6 +131,14 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		} catch (InterruptedException ex) {
 			log.log(Level.SEVERE, "waitUntilFinish", ex);
 		}
+	}
+	
+	@Override
+	public void cancel() {
+		for(Future<T> f : futures) {
+			f.cancel(false);
+		}
+		pool.shutdown();
 	}
 	
 	
