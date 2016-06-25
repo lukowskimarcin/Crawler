@@ -15,8 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.crawler.ICrawlingCallback;
+import org.crawler.ICrawlTask;
+import org.crawler.ICrawlTaskCallback;
 import org.crawler.IWebCrawler;
+import org.crawler.IWebCrawlerCallback;
+import org.crawler.events.WebCrawlerEvent;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron
@@ -27,40 +30,58 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	
 	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
-	//Strony już przetworzone
+	//Strony już odwiedzone
 	private final Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
 	 
+	//Strony dla których byly bledy 
 	private final List<PageWrapper<T>> errorPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
+	//Poprawnie przetworzone strony
 	private final List<PageWrapper<T>> completePages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
+	//Strony aktualnie przetwarzane
 	private final List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	
+	private final List<ICrawlTask<T>> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask<T>>());
 	
 	private final List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
 	
-	private ICrawlingCallback<T> callback;
+	private ICrawlTaskCallback<T> defaultCrawlTaskCallback;
+	
+	private List<IWebCrawlerCallback<T>> webCrawlerCallbacks;
 	
 	private ProxyManager proxyManager;
 	
 	private ExecutorService pool;
 	
-//	private Object lock = new Object();
+	private Long startTime = null;
 	
+	private Long endTime = null;
+	
+	
+	/**
+	 * Gdy osiągnie zero oznacza koniec przetwarzania
+	 */
 	private AtomicInteger counter;
 	
-	public WebCrawler( ) {
-		pool =  Executors.newFixedThreadPool(10);
+	public WebCrawler() {
+		this(10);
+	}
+	
+	public WebCrawler(int nThreads) {
+		pool =  Executors.newFixedThreadPool(nThreads);
 		counter = new AtomicInteger(0);
 	}
 	
 	/**
 	 * Tworzy Managera z zdefiniowanym obserwatorem
 	 * @param callback : obserwator zdarzeń
+	 * @param nThreads : liczba wątków
 	 */
-	public WebCrawler(ICrawlingCallback<T> callback) {
-		pool =  Executors.newFixedThreadPool(10);
+	public WebCrawler(ICrawlTaskCallback<T> defaultCrawlTaskCallback, int nThreads) {
+		pool =  Executors.newFixedThreadPool(nThreads);
 		counter = new AtomicInteger(0);
-		this.callback = callback;
+		this.defaultCrawlTaskCallback = defaultCrawlTaskCallback;
 	}
 	
 	public void shutdown() {
@@ -85,27 +106,40 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		}
 	}
 	
-	public ICrawlingCallback<T> getCrawlingListener() {
-		return callback;
+	public ICrawlTaskCallback<T> getDefaultCrawlTaskListener() {
+		return defaultCrawlTaskCallback;
 	}
 	
 	@Override
-	public void addTask(CrawlTask<T> task) {
-		task.init(this, counter);
+	public void addWebCrawlerListener(IWebCrawlerCallback<T> listener) {
+		if(listener!=null) {
+			if(webCrawlerCallbacks==null) {
+				webCrawlerCallbacks = new ArrayList<>();
+			}
+			webCrawlerCallbacks.add(listener);
+		}
+	}
+	
+	@Override
+	public void addTask(ICrawlTask<T> task) {
+		setStartTime();
+		registerTask();
+		task.init(this);
 		try {
 			Future<T> future = pool.submit(task);
 			futures.add(future);
 		}catch (RejectedExecutionException ex) {
 			fireOnTaskRejected(task);
 		}
-		
 	}
 	
 	@Override
-	public void addTask(Collection<CrawlTask<T>> tasks){
+	public void addTask(Collection<ICrawlTask<T>> tasks){
+		setStartTime();
 		try {
-			for(CrawlTask<T> task : tasks) {
-				task.init(this, counter);
+			for(ICrawlTask<T> task : tasks) {
+				registerTask();
+				task.init(this);
 			}
 			futures.addAll(pool.invokeAll(tasks));
 		} catch (InterruptedException ex) {
@@ -113,16 +147,11 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		}
 	}
 	
-	protected void fireOnTaskRejected(CrawlTask<T> task){
-		log.log(Level.WARNING, "Task rejected: " + task.getPage().getUrl());
-	}
-	
-	
 	@Override
 	public void waitUntilFinish() {
 		try {
 			synchronized (this) {
-				this.wait();
+				wait();
 			}
 		} catch (InterruptedException ex) {
 			log.log(Level.SEVERE, "waitUntilFinish", ex);
@@ -137,14 +166,17 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		pool.shutdown();
 	}
 	
-	
 	public boolean isVisited(PageWrapper<T> page) {
 		boolean result = visitedPages.contains(page.getUrl());
+		if(result){
+			unRegisterTask();
+		}
 		return result;
 	}
 
 	public synchronized void addVisited(PageWrapper<T> page) {
 		visitedPages.add(page.getUrl());
+		fireOnCrawlingChangeStateEvent();
 	}
 	
 	public ProxyManager getProxyManager() {
@@ -155,13 +187,15 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		this.proxyManager = proxyManager;
 	}
 	
-	public ICrawlingCallback<T> getCallback() {
-		return callback;
+	public ICrawlTaskCallback<T> getCallback() {
+		return defaultCrawlTaskCallback;
 	}
 	
 	public synchronized void addErrorPage(PageWrapper<T> page) {
 		processingPages.remove(page);
 		errorPages.add(page);
+		unRegisterTask();
+		fireOnCrawlingChangeStateEvent();
 	}
 	
 	@Override
@@ -169,9 +203,21 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		return errorPages;
 	}
 	
+	private void addRejectedTask(ICrawlTask<T> task) {
+		rejectedTasks.add(task);
+		fireOnCrawlingChangeStateEvent();
+	}
+	
+	@Override
+	public List<ICrawlTask<T>> getRejectedTasks(){
+		return rejectedTasks;
+	}
+	
 	public synchronized void addCompletePage(PageWrapper<T> page) {
 		processingPages.remove(page);
 		completePages.add(page);
+		unRegisterTask();
+		fireOnCrawlingChangeStateEvent();
 	}
 	
 	@Override
@@ -186,6 +232,79 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	@Override
 	public List<PageWrapper<T>> getProcesingPages() {
 		return processingPages;
+	}
+	
+	private void registerTask(){
+		counter.incrementAndGet();
+		fireOnCrawlingChangeStateEvent();
+	}
+	
+	private void unRegisterTask(){
+		int res = counter.decrementAndGet();
+		if (res<=0) {
+			fireOnCrawlingFinishedEvent();
+		}
+	}
+	
+	private WebCrawlerEvent createWebCrawlerEvent() {
+		WebCrawlerEvent event = new WebCrawlerEvent();
+		event.setTotalPages(futures.size() + rejectedTasks.size());
+		event.setCompletePages(completePages.size());
+		event.setErrorPages(errorPages.size());
+		event.setVisitedPages(visitedPages.size());
+		event.setProcessingPages(processingPages.size());
+		event.setRejectedPages(rejectedTasks.size());
+		event.setElapsedTime(getElapsedTime());
+		return event;
+	}
+	 
+	protected void fireOnCrawlingFinishedEvent() {		
+		synchronized (this) {
+			notifyAll();	
+		}
+		shutdown();
+		WebCrawlerEvent event = createWebCrawlerEvent();
+
+		if(webCrawlerCallbacks!=null) {
+			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
+				callback.onCrawlingFinished(event);
+			}
+		}
+	}
+
+	protected void fireOnCrawlingChangeStateEvent() {
+		if(webCrawlerCallbacks!=null) {
+			WebCrawlerEvent event = createWebCrawlerEvent();
+			
+			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
+				callback.onCrawlingChangeState(event);
+			}
+		}
+	}
+	
+	protected void fireOnTaskRejected(ICrawlTask<T> task){
+		addRejectedTask(task);
+		unRegisterTask();
+		if(webCrawlerCallbacks!=null) {
+			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
+				callback.onTaskRejected(task);
+			}
+		}
+		
+	}
+	
+	private void setStartTime() {
+		if(startTime==null) {
+			startTime = System.currentTimeMillis();
+		}
+	}
+	
+	private long getElapsedTime(){
+		endTime = System.currentTimeMillis();
+		if(startTime!=null) {
+			return endTime-startTime;
+		}
+		return -1;
 	}
 	
 }

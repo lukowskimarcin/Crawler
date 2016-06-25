@@ -25,16 +25,17 @@ public interface IWebCrawler<T> {
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
-	void addTask(CrawlTask<T> task);
+	void addTask(ICrawlTask<T> task);
 	
-	
-	void addTask(Collection<CrawlTask<T>> tasks);
+	void addTask(Collection<ICrawlTask<T>> tasks);
 	
 	/**
-	 * Metoda zwraca globalnego obserwatora zdarzeń
+	 * Metoda zwraca globalnego obserwatora zdarzeń dla zadań
 	 * @return
 	 */
-	ICrawlingCallback<T> getCrawlingListener();
+	ICrawlTaskCallback<T> getDefaultCrawlTaskListener();
+	
+	void addWebCrawlerListener(IWebCrawlerCallback<T> listener);
 	
 	void shutdown();
 	
@@ -52,8 +53,9 @@ public interface IWebCrawler<T> {
 	
 	List<PageWrapper<T>> getProcesingPages();
 	
-	void waitUntilFinish();
+	List<ICrawlTask<T>> getRejectedTasks();
 	
+	void waitUntilFinish();
 	
 	void cancel();
 	

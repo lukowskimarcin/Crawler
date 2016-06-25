@@ -16,13 +16,13 @@ public interface ICrawlTask<T> extends Callable<T>   {
 	 * Metoda inicjuje zadanie do wykonania
 	 * @param webCrawler crawler, który ma wykonać zadanie
 	 */
-	void init(IWebCrawler<T> webCrawler, AtomicInteger counter);
+	void init(IWebCrawler<T> webCrawler);
 	
 	/**
 	 * Metoda dodaje obserwatora do zdarzeń crawlera
 	 * @param listener
 	 */
-	void addCrawlingListener(ICrawlingCallback<T> listener);
+	void addCrawTaskListener(ICrawlTaskCallback<T> listener);
 
 	/**
 	 * Metoda przetwarzająca stronę

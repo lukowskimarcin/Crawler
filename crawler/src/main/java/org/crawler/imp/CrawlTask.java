@@ -3,13 +3,13 @@ package org.crawler.imp;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.crawler.ICrawlTask;
-import org.crawler.ICrawlingCallback;
+import org.crawler.ICrawlTaskCallback;
 import org.crawler.IWebCrawler;
+import org.crawler.events.CrawlTaskEvent;
 
 /**
  * Zadanie parsowania strony
@@ -21,38 +21,40 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable   {
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
-	private List<ICrawlingCallback<T>> callbacks;
-	
-	private AtomicInteger counter;
+	private List<ICrawlTaskCallback<T>> callbacks;
 	
 	protected IWebCrawler<T> webCrawler;
 	protected PageWrapper<T> page;
+	
+	//Poczatek przetwarzania
+	private long startTime;
+	
+	//Koniec przetwarzania
+	private long endTime;
 	
 	public CrawlTask(PageWrapper<T> page) {
 		this.page = page;
 	}
 	
-	public CrawlTask(PageWrapper<T> page, ICrawlingCallback<T> listener) {
+	public CrawlTask(PageWrapper<T> page, ICrawlTaskCallback<T> listener) {
 		this(page);
-		addCrawlingListener(listener);
+		addCrawTaskListener(listener);
 	}
 	 
 	public abstract void parsePage() throws Exception;
 	
-	public void init(IWebCrawler<T> webCrawler, AtomicInteger counter) {
+	public void init(IWebCrawler<T> webCrawler) {
 		this.webCrawler = webCrawler;
-		this.counter = counter;
 		
-		ICrawlingCallback<T> callback = webCrawler.getCrawlingListener();
+		ICrawlTaskCallback<T> callback = webCrawler.getDefaultCrawlTaskListener();
 		if(callback!=null) {
-			addCrawlingListener(callback);
+			addCrawTaskListener(callback);
 		}
 	}
 	
 	@Override
 	public T call() throws Exception {
 		try {
-			counter.incrementAndGet();
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
 				
@@ -66,20 +68,16 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable   {
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
-		finally {
-			int res = counter.decrementAndGet();
-			if (res<=0) {
-				fireOnCrawlingFinishedEvent();
-			}
-		}
 		return page.getData();
 	}
 	 
-	public void addCrawlingListener(ICrawlingCallback<T> listener) {
-		if(callbacks==null) {
-			callbacks = new ArrayList<ICrawlingCallback<T>>();
+	public void addCrawTaskListener(ICrawlTaskCallback<T> listener) {
+		if(listener != null) {
+			if(callbacks==null) {
+				callbacks = new ArrayList<ICrawlTaskCallback<T>>();
+			}
+			callbacks.add(listener);
 		}
-		callbacks.add(listener);
 	}
 	
 	public PageWrapper<T> getPage() { 
@@ -87,52 +85,57 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable   {
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
-		webCrawler.addProcessingPage(page);
+		startTime = System.currentTimeMillis();
+		
 		if(callbacks!=null) {
-			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onPageCrawlingStart(this, page);
+			for(ICrawlTaskCallback<T> callback : callbacks){
+				callback.onPageCrawlingStart(new CrawlTaskEvent<T>(this, page));
 			}
 		}
+		webCrawler.addProcessingPage(page);
 	}
 	
 	protected void fireOnPageCrawlingCompletedEvent(){
-		webCrawler.addCompletePage(page);
+		endTime = System.currentTimeMillis();
+		
 		if(callbacks!=null) {
-			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onPageCrawlingCompleted(this, page);
+			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page, endTime-startTime);
+			for(ICrawlTaskCallback<T> callback : callbacks){
+				callback.onPageCrawlingCompleted(event);
 			}
 		}
+		webCrawler.addCompletePage(page);
 	}
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
-		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);
+		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);	
+		if(callbacks!=null) {
+			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+			event.setErrorMessage(ex.getMessage());
+			
+			for(ICrawlTaskCallback<T> callback : callbacks){
+				callback.onPageCrawlingFailed(event);
+			}
+		}
 		webCrawler.addErrorPage(page);
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {
 		if(callbacks!=null) {
-			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onAlreadyVisited(this, page);
+			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+			for(ICrawlTaskCallback<T> callback : callbacks){
+				callback.onAlreadyVisited(event);
 			}
 		}
 	}
 
 	protected void fireOnPageProcessingProgressEvent(int percent) {
 		if(callbacks!=null) {
-			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onPageProcessingProgress(this, page, percent);
-			}
-		}
-	}
-	
-	protected void fireOnCrawlingFinishedEvent() {		
-		synchronized (webCrawler) {
-			webCrawler.notifyAll();	
-		}
-		webCrawler.shutdown();
-		if(callbacks!=null) {
-			for(ICrawlingCallback<T> callback : callbacks){
-				callback.onCrawlingFinished();
+			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+			event.setPercent(percent);
+			
+			for(ICrawlTaskCallback<T> callback : callbacks){
+				callback.onPageProcessingProgress(event);
 			}
 		}
 	}

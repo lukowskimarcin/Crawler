@@ -26,6 +26,11 @@ public class PageWrapper<T> implements Serializable {
 	}
 	
 	@Override
+	public int hashCode() {
+		return url.hashCode();
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		PageWrapper<?> second = (PageWrapper<?>) obj;
 		return  url.equals(second.getUrl());

@@ -1,5 +1,6 @@
 package org.crawler;
 
+import org.crawler.events.CrawlTaskEvent;
 import org.crawler.imp.PageWrapper;
 
 /**
@@ -7,21 +8,21 @@ import org.crawler.imp.PageWrapper;
  * @author Marcin
  * 
  */
-public interface ICrawlingCallback<T> {
+public interface ICrawlTaskCallback<T> {
 	
 	/**
 	 * Zdarzenie rozpoczecia przetwarzania strony
 	 * @param crawler 
 	 * @param page
 	 */
-	void onPageCrawlingStart(ICrawlTask<T> crawler, PageWrapper<T> page); 
+	void onPageCrawlingStart(CrawlTaskEvent<T> event); 
 	
 	/**
 	 * Zdarzenie zakończenia przetwarzania strony
 	 * @param crawler
 	 * @param page
 	 */
-	void onPageCrawlingCompleted(ICrawlTask<T> crawler, PageWrapper<T> page);
+	void onPageCrawlingCompleted(CrawlTaskEvent<T> event);
 	
 	
 	/**
@@ -29,14 +30,14 @@ public interface ICrawlingCallback<T> {
 	 * @param crawler
 	 * @param page
 	 */
-	void onPageCrawlingFailed(ICrawlTask<T> crawler, PageWrapper<T> page);
+	void onPageCrawlingFailed(CrawlTaskEvent<T> event);
 	
 	/**
 	 * Zdarzenie ponownego zgłoszenia strony do przetworzenia
 	 * @param crawler
 	 * @param page
 	 */
-	void onAlreadyVisited(ICrawlTask<T> crawler, PageWrapper<T> page);
+	void onAlreadyVisited(CrawlTaskEvent<T> event);
 	
 	/**
 	 * Zdarzenie dla postępu prac nad stroną
@@ -44,9 +45,6 @@ public interface ICrawlingCallback<T> {
 	 * @param page
 	 * @param percent
 	 */
-	void onPageProcessingProgress(ICrawlTask<T> crawler, PageWrapper<T> page, int percent);
-	
-	
-	void onCrawlingFinished();
+	void onPageProcessingProgress(CrawlTaskEvent<T> event);
 	
 }

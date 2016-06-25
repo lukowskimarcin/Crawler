@@ -1,12 +1,14 @@
 package org.crawler.app;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 import org.crawler.ICrawlTask;
-import org.crawler.ICrawlingCallback;
+import org.crawler.ICrawlTaskCallback;
 import org.crawler.IWebCrawler;
+import org.crawler.IWebCrawlerCallback;
+import org.crawler.events.CrawlTaskEvent;
+import org.crawler.events.WebCrawlerEvent;
 import org.crawler.imp.CrawlTask;
 import org.crawler.imp.PageWrapper;
 import org.crawler.imp.Proxy;
@@ -62,66 +64,74 @@ public static void main(String[] args) throws InterruptedException {
 		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
 		
 		
-		ICrawlingCallback<List<Proxy>> callback = new ICrawlingCallback<List<Proxy>>() {
-
+		ICrawlTaskCallback<List<Proxy>> callback = new  ICrawlTaskCallback<List<Proxy>>() {
+			
 			@Override
-			public void onPageCrawlingStart(ICrawlTask<List<Proxy>> crawler, PageWrapper<List<Proxy>> page) {
-			//	System.out.println("Start : " + page.getUrl() );
-			}
-
-			@Override
-			public void onPageCrawlingCompleted(ICrawlTask<List<Proxy>> crawler, PageWrapper<List<Proxy>> page) {
-				int size = 0;
-				if(page.getData()!=null){
-					size = page.getData().size();
-				}
+			public void onPageProcessingProgress(CrawlTaskEvent<List<Proxy>> event) {
+				// TODO Auto-generated method stub
 				
-				System.out.println("Complete : " + page.getUrl() + " size: " + size);
-			}
-
-			@Override
-			public void onPageCrawlingFailed(ICrawlTask<List<Proxy>> crawler, PageWrapper<List<Proxy>> page) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onAlreadyVisited(ICrawlTask<List<Proxy>> crawler, PageWrapper<List<Proxy>> page) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onPageProcessingProgress(ICrawlTask<List<Proxy>> crawler, PageWrapper<List<Proxy>> page,
-					int percent) {
-				// TODO Auto-generated method stub
 			}
 			
 			@Override
-			public void onCrawlingFinished() {
-				System.out.println("All pages crawled !!!");
+			public void onPageCrawlingStart(CrawlTaskEvent<List<Proxy>> event) {
+				// TODO Auto-generated method stub
 				
 			}
-		};  
+			
+			@Override
+			public void onPageCrawlingFailed(CrawlTaskEvent<List<Proxy>> event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onPageCrawlingCompleted(CrawlTaskEvent<List<Proxy>> event) {
+				System.out.println("Page complete " + event.getPage().getUrl() + " [" + event.getTimeSeconds() + " sec]");
+			}
+			
+			@Override
+			public void onAlreadyVisited(CrawlTaskEvent<List<Proxy>> event) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 		
-		IWebCrawler<List<Proxy>> proxyWebCrawler = new WebCrawler<List<Proxy>>(callback);
+		IWebCrawler<List<Proxy>> proxyWebCrawler = new WebCrawler<List<Proxy>>(callback, 8);
+		
+		proxyWebCrawler.addWebCrawlerListener(new IWebCrawlerCallback<List<Proxy>>() {
+			
+			@Override
+			public void onCrawlingFinished(WebCrawlerEvent event) {
+				System.out.println("CRAWLING FINISHED!!!");
+				System.out.println(event);
+			}
+			
+			@Override
+			public void onCrawlingChangeState(WebCrawlerEvent event) {
+				//System.out.println(event);
+			}
+			
+			@Override
+			public void onTaskRejected(ICrawlTask<List<Proxy>> task) {
+				System.out.println("Task rejected: " + task.getPage().getUrl());
+			}
+			
+		});
+		
 		
 		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"));
 		proxyWebCrawler.addTask(rootTask);
 		
 		Thread.sleep(10);
 		
+		//System.out.println("waitUntilFinish");
 		//proxyWebCrawler.cancel();
 		proxyWebCrawler.waitUntilFinish();
 		
 		
-		proxyWebCrawler.shutdownAndAwaitTermination();		
+		//proxyWebCrawler.shutdownAndAwaitTermination();		
 		System.out.println("END");
-		
-		 System.out.println("Errors: " + proxyWebCrawler.getErrorPages().size());
-		 System.out.println("Processing: " + proxyWebCrawler.getProcesingPages().size());
-		 System.out.println("Completed: " + proxyWebCrawler.getCompletePages().size());
-		
-		
- 
+		 
 	}
 
 }
