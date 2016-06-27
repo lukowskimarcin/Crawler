@@ -83,7 +83,7 @@ public class SampleController {
 		 
 		//proxyWebCrawler.addTask(new ProxyCentrumPagesCrawler("http://prx.centrump2p.com"));
 		
-		System.out.println("waitUntilFinish!!!");
+		System.out.println("waitUntilFinish!!");
 		//proxyWebCrawler.cancel();
 		proxyWebCrawler.waitUntilFinish();
 		
