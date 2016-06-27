@@ -32,12 +32,12 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable   {
 	//Koniec przetwarzania
 	private long endTime;
 	
-	public CrawlTask(PageWrapper<T> page) {
-		this.page = page;
+	public CrawlTask(String url) {
+		this.page = new PageWrapper<>(url);
 	}
 	
 	public CrawlTask(PageWrapper<T> page, ICrawlTaskCallback<T> listener) {
-		this(page);
+		this.page = page;
 		addCrawTaskListener(listener);
 	}
 	 

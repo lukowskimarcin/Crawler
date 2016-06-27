@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.PageWrapper;
 import org.crawler.imp.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class ProxyCentrumDetailCrawler extends CrawlTask<List<Proxy>> {
 	private static final long serialVersionUID = -5028690879897857829L;
 	
-	public ProxyCentrumDetailCrawler(PageWrapper<List<Proxy>> page) {
-		super(page);
+	public ProxyCentrumDetailCrawler(String url){
+		super(url);
 	}
+	
 
 	@Override
 	public void parsePage() throws Exception {

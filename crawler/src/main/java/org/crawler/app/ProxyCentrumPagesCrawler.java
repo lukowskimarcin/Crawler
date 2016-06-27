@@ -24,8 +24,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
 	private static final long serialVersionUID = 1610323384868842390L;
 
-	public ProxyCentrumPagesCrawler(PageWrapper<List<Proxy>> page) {
-		super(page);
+	public ProxyCentrumPagesCrawler(String url){
+		super(url);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
 				if(href.matches(".*/[0-9]+")) {
 					String url = "http://prx.centrump2p.com" + href;
 					PageWrapper<List<Proxy>> nextPage = new PageWrapper<List<Proxy>>(url, page.getLevel()+1);
-					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(nextPage);
+					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url);
 					webCrawler.addTask(task); 
 				}
 			}catch (Exception ex) {
@@ -91,7 +91,7 @@ public static void main(String[] args) throws InterruptedException {
 			
 			@Override
 			public void onAlreadyVisited(CrawlTaskEvent<List<Proxy>> event) {
-				// TODO Auto-generated method stub
+				System.out.println("Already visited " + event.getPage().getUrl());
 				
 			}
 		};
@@ -119,14 +119,15 @@ public static void main(String[] args) throws InterruptedException {
 		});
 		
 		
-		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler(new PageWrapper<List<Proxy>>("http://prx.centrump2p.com"));
+		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com");
 		proxyWebCrawler.addTask(rootTask);
 		
 		Thread.sleep(10);
+		proxyWebCrawler.addTask(new ProxyCentrumPagesCrawler("http://prx.centrump2p.com"));
 		
 		//System.out.println("waitUntilFinish");
 		//proxyWebCrawler.cancel();
-		proxyWebCrawler.waitUntilFinish();
+		//proxyWebCrawler.waitUntilFinish();
 		
 		
 		//proxyWebCrawler.shutdownAndAwaitTermination();		
