@@ -10,7 +10,6 @@ import org.crawler.IWebCrawlerCallback;
 import org.crawler.events.CrawlTaskEvent;
 import org.crawler.events.WebCrawlerEvent;
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.PageWrapper;
 import org.crawler.imp.Proxy;
 import org.crawler.imp.WebCrawler;
 
@@ -44,7 +43,6 @@ public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
 				
 				if(href.matches(".*/[0-9]+")) {
 					String url = "http://prx.centrump2p.com" + href;
-					PageWrapper<List<Proxy>> nextPage = new PageWrapper<List<Proxy>>(url, page.getLevel()+1);
 					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url);
 					webCrawler.addTask(task); 
 				}

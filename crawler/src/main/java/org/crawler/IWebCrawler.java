@@ -3,7 +3,6 @@ package org.crawler;
 import java.util.Collection;
 import java.util.List;
 
-import org.crawler.imp.CrawlTask;
 import org.crawler.imp.PageWrapper;
 
 public interface IWebCrawler<T> {

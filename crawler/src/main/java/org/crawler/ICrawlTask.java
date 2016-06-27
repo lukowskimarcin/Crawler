@@ -1,7 +1,6 @@
 package org.crawler;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.crawler.imp.PageWrapper;
 

@@ -1,7 +1,6 @@
 package org.crawler;
 
 import org.crawler.events.CrawlTaskEvent;
-import org.crawler.imp.PageWrapper;
 
 /**
  * Zdarzenia zwrotne crawlerow 
