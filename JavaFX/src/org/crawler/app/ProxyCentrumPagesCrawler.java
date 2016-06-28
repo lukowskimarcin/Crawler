@@ -47,7 +47,5 @@ public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
 		page.setData(null);
 		
 	}
-	
- 
 
 }

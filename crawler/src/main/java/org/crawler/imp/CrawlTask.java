@@ -15,11 +15,10 @@ import org.crawler.events.CrawlTaskEvent;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements ICrawlTask<T>, Serializable    {
+public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
 	private static final long serialVersionUID = 148486884050800551L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
-	
 	
 	
 	protected IWebCrawler<T> webCrawler;
@@ -43,8 +42,6 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 	
 	public void init(IWebCrawler<T> webCrawler) {
 		this.webCrawler = webCrawler;
-		
-		 
 	}
 	
 	@Override
@@ -54,6 +51,7 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 				webCrawler.addVisited(page);
 				
 				fireOnPageCrawlingStartEvent();
+				
 				parsePage();	
 				
 				fireOnPageCrawlingCompletedEvent();
@@ -70,7 +68,7 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 		return page;
 	}
 	
-	protected void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners) {
+	private void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners) {
 		if(listeners!=null) {
 			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
 			
@@ -80,7 +78,7 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 		}
 	}
 	
-	protected void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners, CrawlTaskEvent<T> event ) {
+	private void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners, CrawlTaskEvent<T> event ) {
 		if(listeners!=null) {
 			for(IEventListener<CrawlTaskEvent<T>> callback : listeners){
 				callback.handle(event);
@@ -91,16 +89,16 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 	protected void fireOnPageProcessingProgressEvent(double progress) {
 		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
 		event.setProgress(progress);
-		fireEvent(onPageProcessingProgressListener, event);
+		fireEvent(webCrawler.getOnPageProcessingProgressListener(), event);
 	}
 	
 	protected void fireOnAlreadyVisitedEvent() {
-		fireEvent(onPageAlreadyVisitedListener);
+		fireEvent(webCrawler.getOnAlreadyVisitedListener());
 	}
 	
 	protected void fireOnPageCrawlingStartEvent(){
 		startTime = System.currentTimeMillis();
-		fireEvent(onPageCrawlingStartListener);
+		fireEvent(webCrawler.getOnPageCrawlingStartListener());
 		webCrawler.addProcessingPage(page);
 	}
 	
@@ -108,7 +106,7 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 		endTime = System.currentTimeMillis();
 		
 		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page, endTime-startTime);
-		fireEvent(onPageCrawlingStartListener, event);
+		fireEvent(webCrawler.getOnPageCrawlingCompletedListener(), event);
 		 
 		webCrawler.addCompletePage(page);
 	}
@@ -118,7 +116,7 @@ public abstract class CrawlTask<T> extends CrawlTaskBaseListener<T>  implements 
 		
 		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
 		event.setErrorMessage(ex.getMessage());
-		fireEvent(onPageCrawlingStartListener, event);
+		fireEvent(webCrawler.getOnPageCrawlingFailedListener(), event);
 		 
 		webCrawler.addErrorPage(page);
 	}

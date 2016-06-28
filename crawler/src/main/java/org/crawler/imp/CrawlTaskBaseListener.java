@@ -3,6 +3,7 @@ package org.crawler.imp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.crawler.ICrawlTaskListener;
 import org.crawler.IEventListener;
 import org.crawler.events.CrawlTaskEvent;
 
@@ -12,7 +13,7 @@ import org.crawler.events.CrawlTaskEvent;
  *
  * @param <T>
  */
-public class CrawlTaskBaseListener<T> {
+public class CrawlTaskBaseListener<T> implements ICrawlTaskListener<T> {
 	
 	protected List<IEventListener<CrawlTaskEvent<T>>> onPageCrawlingStartListener;
 	protected List<IEventListener<CrawlTaskEvent<T>>> onPageCrawlingCompletedListener;
@@ -20,10 +21,12 @@ public class CrawlTaskBaseListener<T> {
 	protected List<IEventListener<CrawlTaskEvent<T>>> onPageAlreadyVisitedListener;
 	protected List<IEventListener<CrawlTaskEvent<T>>> onPageProcessingProgressListener;
 
-	
+	@Override
 	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingStartListener() {
 		return onPageCrawlingStartListener;
 	}
+	
+	@Override
 	public void addOnPageCrawlingStartListener(IEventListener<CrawlTaskEvent<T>> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingStartListener==null) {
@@ -33,9 +36,12 @@ public class CrawlTaskBaseListener<T> {
 		}
 	}
 	
+	@Override
 	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingCompletedListener() {
 		return onPageCrawlingCompletedListener;
 	}
+	
+	@Override
 	public void addOnPageCrawlingCompletedListener(IEventListener<CrawlTaskEvent<T>> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingCompletedListener==null) {
@@ -45,9 +51,12 @@ public class CrawlTaskBaseListener<T> {
 		}
 	}
 	 
+	@Override
 	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingFailedListener() {
 		return onPageCrawlingFailedListener;
 	}
+	
+	@Override
 	public void addOnPageCrawlingFailedListener(IEventListener<CrawlTaskEvent<T>> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingFailedListener==null) {
@@ -57,9 +66,12 @@ public class CrawlTaskBaseListener<T> {
 		}
 	}
 	
+	@Override
 	public List<IEventListener<CrawlTaskEvent<T>>> getOnAlreadyVisitedListener() {
 		return onPageAlreadyVisitedListener;
 	}
+	
+	@Override
 	public void addOnAlreadyVisitedListener(IEventListener<CrawlTaskEvent<T>> listener) {
 		if(listener!=null) {
 			if(onPageAlreadyVisitedListener==null) {
@@ -69,9 +81,12 @@ public class CrawlTaskBaseListener<T> {
 		}
 	}
 	
+	@Override
 	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageProcessingProgressListener() {
 		return onPageProcessingProgressListener;
 	}
+	
+	@Override
 	public void addOnPageProcessingProgressListener(IEventListener<CrawlTaskEvent<T>> listener) {
 		if(listener!=null) {
 			if(onPageProcessingProgressListener==null) {

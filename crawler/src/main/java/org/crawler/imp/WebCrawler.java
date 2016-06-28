@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import org.crawler.ICrawlTask;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
-import org.crawler.events.CrawlTaskEvent;
 import org.crawler.events.WebCrawlerEvent;
 
 /**
@@ -242,7 +241,9 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	}
 	
 	private List<IEventListener<WebCrawlerEvent>> onCrawlingFinishedListener;
-	void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener) {
+	
+	@Override
+	public void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener) {
 		if(listener!=null) {
 			if(onCrawlingFinishedListener==null) {
 				onCrawlingFinishedListener = new ArrayList<IEventListener<WebCrawlerEvent>>();
@@ -266,7 +267,9 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	}
 	
 	private List<IEventListener<WebCrawlerEvent>> onCrawlingChangeStateListener;
-	void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener) {
+	
+	@Override
+	public void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener) {
 		if(listener!=null) {
 			if(onCrawlingChangeStateListener==null) {
 				onCrawlingChangeStateListener = new ArrayList<IEventListener<WebCrawlerEvent>>();
@@ -287,7 +290,9 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	
 	
 	private List<IEventListener<ICrawlTask<T>>> onTaskRejectedListener;
-	void addOnTaskRejectedListener(IEventListener<ICrawlTask<T>> listener) {
+	
+	@Override
+	public void addOnTaskRejectedListener(IEventListener<ICrawlTask<T>> listener) {
 		if(listener!=null) {
 			if(onTaskRejectedListener==null) {
 				onTaskRejectedListener = new ArrayList<IEventListener<ICrawlTask<T>>>();
