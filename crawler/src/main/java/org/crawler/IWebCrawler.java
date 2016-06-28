@@ -28,14 +28,6 @@ public interface IWebCrawler<T> {
 	
 	void addTask(Collection<ICrawlTask<T>> tasks);
 	
-	/**
-	 * Metoda zwraca globalnego obserwatora zdarzeń dla zadań
-	 * @return
-	 */
-	ICrawlTaskCallback<T> getDefaultCrawlTaskListener();
-	
-	void addWebCrawlerListener(IWebCrawlerCallback<T> listener);
-	
 	void shutdown();
 	
 	void shutdownAndAwaitTermination(); 

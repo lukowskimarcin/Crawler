@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.crawler.ICrawlTask;
-import org.crawler.ICrawlTaskCallback;
+import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
-import org.crawler.IWebCrawlerCallback;
+import org.crawler.events.CrawlTaskEvent;
 import org.crawler.events.WebCrawlerEvent;
 
 /**
@@ -26,7 +26,7 @@ import org.crawler.events.WebCrawlerEvent;
  * @author Marcin
  *
  */
-public class WebCrawler<T> implements IWebCrawler<T>   {
+public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawler<T>   {
 	
 	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
@@ -45,10 +45,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 	private final List<ICrawlTask<T>> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask<T>>());
 	
 	private final List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
-	
-	private ICrawlTaskCallback<T> defaultCrawlTaskCallback;
-	
-	private List<IWebCrawlerCallback<T>> webCrawlerCallbacks;
 	
 	private ProxyManager proxyManager;
 	
@@ -73,17 +69,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		counter = new AtomicInteger(0);
 	}
 	
-	/**
-	 * Tworzy Managera z zdefiniowanym obserwatorem
-	 * @param callback : obserwator zdarzeń
-	 * @param nThreads : liczba wątków
-	 */
-	public WebCrawler(ICrawlTaskCallback<T> defaultCrawlTaskCallback, int nThreads) {
-		pool =  Executors.newFixedThreadPool(nThreads);
-		counter = new AtomicInteger(0);
-		this.defaultCrawlTaskCallback = defaultCrawlTaskCallback;
-	}
-	
 	public void shutdown() {
 		pool.shutdown();
 	}
@@ -103,20 +88,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 			pool.shutdownNow();
 			// Preserve interrupt status
 			Thread.currentThread().interrupt();
-		}
-	}
-	
-	public ICrawlTaskCallback<T> getDefaultCrawlTaskListener() {
-		return defaultCrawlTaskCallback;
-	}
-	
-	@Override
-	public void addWebCrawlerListener(IWebCrawlerCallback<T> listener) {
-		if(listener!=null) {
-			if(webCrawlerCallbacks==null) {
-				webCrawlerCallbacks = new ArrayList<>();
-			}
-			webCrawlerCallbacks.add(listener);
 		}
 	}
 	
@@ -187,10 +158,7 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		this.proxyManager = proxyManager;
 	}
 	
-	public ICrawlTaskCallback<T> getCallback() {
-		return defaultCrawlTaskCallback;
-	}
-	
+	 
 	public synchronized void addErrorPage(PageWrapper<T> page) {
 		processingPages.remove(page);
 		errorPages.add(page);
@@ -246,53 +214,6 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		}
 	}
 	
-	private WebCrawlerEvent createWebCrawlerEvent() {
-		WebCrawlerEvent event = new WebCrawlerEvent();
-		event.setTotalPages(futures.size() + rejectedTasks.size());
-		event.setCompletePages(completePages.size());
-		event.setErrorPages(errorPages.size());
-		event.setVisitedPages(visitedPages.size());
-		event.setProcessingPages(processingPages.size());
-		event.setRejectedPages(rejectedTasks.size());
-		event.setElapsedTime(getElapsedTime());
-		return event;
-	}
-	 
-	protected void fireOnCrawlingFinishedEvent() {		
-		synchronized (this) {
-			notifyAll();	
-		}
-		shutdown();
-		WebCrawlerEvent event = createWebCrawlerEvent();
-
-		if(webCrawlerCallbacks!=null) {
-			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
-				callback.onCrawlingFinished(event);
-			}
-		}
-	}
-
-	protected void fireOnCrawlingChangeStateEvent() {
-		if(webCrawlerCallbacks!=null) {
-			WebCrawlerEvent event = createWebCrawlerEvent();
-			
-			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
-				callback.onCrawlingChangeState(event);
-			}
-		}
-	}
-	
-	protected void fireOnTaskRejected(ICrawlTask<T> task){
-		addRejectedTask(task);
-		unRegisterTask();
-		if(webCrawlerCallbacks!=null) {
-			for(IWebCrawlerCallback<T> callback : webCrawlerCallbacks){
-				callback.onTaskRejected(task);
-			}
-		}
-		
-	}
-	
 	private void setStartTime() {
 		if(startTime==null) {
 			startTime = System.currentTimeMillis();
@@ -306,5 +227,85 @@ public class WebCrawler<T> implements IWebCrawler<T>   {
 		}
 		return -1;
 	}
+	
+	//Crawler Events
+	private WebCrawlerEvent createWebCrawlerEvent() {
+		WebCrawlerEvent event = new WebCrawlerEvent();
+		event.setTotalPages(futures.size() + rejectedTasks.size());
+		event.setCompletePages(completePages.size());
+		event.setErrorPages(errorPages.size());
+		event.setVisitedPages(visitedPages.size());
+		event.setProcessingPages(processingPages.size());
+		event.setRejectedPages(rejectedTasks.size());
+		event.setElapsedTime(getElapsedTime());
+		return event;
+	}
+	
+	private List<IEventListener<WebCrawlerEvent>> onCrawlingFinishedListener;
+	void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener) {
+		if(listener!=null) {
+			if(onCrawlingFinishedListener==null) {
+				onCrawlingFinishedListener = new ArrayList<IEventListener<WebCrawlerEvent>>();
+			}
+			onCrawlingFinishedListener.add(listener);
+		}
+	}
+	 
+	protected void fireOnCrawlingFinishedEvent() {		
+		synchronized (this) {
+			notifyAll();	
+		}
+		shutdown();
+		WebCrawlerEvent event = createWebCrawlerEvent();
+
+		if(onCrawlingFinishedListener!=null) {
+			for(IEventListener<WebCrawlerEvent> callback : onCrawlingFinishedListener){
+				callback.handle(event);
+			}
+		}
+	}
+	
+	private List<IEventListener<WebCrawlerEvent>> onCrawlingChangeStateListener;
+	void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener) {
+		if(listener!=null) {
+			if(onCrawlingChangeStateListener==null) {
+				onCrawlingChangeStateListener = new ArrayList<IEventListener<WebCrawlerEvent>>();
+			}
+			onCrawlingChangeStateListener.add(listener);
+		}
+	}
+
+	protected void fireOnCrawlingChangeStateEvent() {
+		if(onCrawlingChangeStateListener!=null) {
+			WebCrawlerEvent event = createWebCrawlerEvent();
+			
+			for(IEventListener<WebCrawlerEvent> callback : onCrawlingChangeStateListener){
+				callback.handle(event);
+			}
+		}
+	}
+	
+	
+	private List<IEventListener<ICrawlTask<T>>> onTaskRejectedListener;
+	void addOnTaskRejectedListener(IEventListener<ICrawlTask<T>> listener) {
+		if(listener!=null) {
+			if(onTaskRejectedListener==null) {
+				onTaskRejectedListener = new ArrayList<IEventListener<ICrawlTask<T>>>();
+			}
+			onTaskRejectedListener.add(listener);
+		}
+	}
+	
+	protected void fireOnTaskRejected(ICrawlTask<T> task){
+		addRejectedTask(task);
+		unRegisterTask();
+		if(onTaskRejectedListener!=null) {
+			for(IEventListener<ICrawlTask<T>> callback : onTaskRejectedListener){
+				callback.handle(task);
+			}
+		}
+		
+	}
+	
 	
 }

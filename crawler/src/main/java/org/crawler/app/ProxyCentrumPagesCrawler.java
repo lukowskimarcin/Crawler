@@ -1,17 +1,9 @@
 package org.crawler.app;
 
 import java.util.List;
-import java.util.logging.Level;
 
-import org.crawler.ICrawlTask;
-import org.crawler.ICrawlTaskCallback;
-import org.crawler.IWebCrawler;
-import org.crawler.IWebCrawlerCallback;
-import org.crawler.events.CrawlTaskEvent;
-import org.crawler.events.WebCrawlerEvent;
 import org.crawler.imp.CrawlTask;
 import org.crawler.imp.Proxy;
-import org.crawler.imp.WebCrawler;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;

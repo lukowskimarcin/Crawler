@@ -12,7 +12,7 @@ public class CrawlTaskEvent<T> {
 	//czas w ms
 	private long time;
 	
-	private int percent;
+	private double progress;
 	
 	private String errorMessage;
 
@@ -46,14 +46,15 @@ public class CrawlTaskEvent<T> {
 		return String.format("%.2f", time * 1.0 / 1000);
 	}
 
-	public int getPercent() {
-		return percent;
+	public double getProgress() {
+		return progress;
 	}
 
 
-	public void setPercent(int percent) {
-		this.percent = percent;
+	public void setProgress(double progress) {
+		this.progress = progress;
 	}
+
 
 	public String getErrorMessage() {
 		return errorMessage;
