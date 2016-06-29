@@ -6,13 +6,14 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="126.0" prefWidth="284.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
    <children>
-      <Pane prefHeight="200.0" prefWidth="200.0">
+      <Pane prefHeight="147.0" prefWidth="290.0">
          <children>
-            <Button fx:id="button" layoutX="21.0" layoutY="127.0" mnemonicParsing="false" onAction="#onAction" text="Start" />
-            <ProgressIndicator fx:id="indicator" layoutX="127.0" layoutY="107.0" progress="0.0" />
-            <ProgressBar fx:id="progressBar" layoutX="14.0" layoutY="46.0" prefHeight="18.0" prefWidth="157.0" progress="0.0" />
+            <Button fx:id="button" layoutX="14.0" layoutY="63.0" mnemonicParsing="false" onAction="#onStartAction" text="Start" />
+            <ProgressIndicator fx:id="indicator" layoutX="240.0" layoutY="14.0" progress="0.0" />
+            <ProgressBar fx:id="progressBar" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="215.0" progress="0.0" />
+            <Button fx:id="stop" layoutX="74.0" layoutY="63.0" mnemonicParsing="false" onAction="#onStopAction" text="Stop" />
          </children>
       </Pane>
    </children>

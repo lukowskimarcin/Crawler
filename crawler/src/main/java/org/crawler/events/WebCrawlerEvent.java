@@ -101,6 +101,15 @@ public class WebCrawlerEvent {
 		this.elapsedTime = elapsedTime;
 	}
 	
+	public double getProgress(){
+		if(totalPages==0) {
+			return 0;
+		}
+		
+		double percent = 1.0 * (completePages + errorPages +  rejectedPages) / totalPages;
+		return percent;
+	}
+	
 	
 	@Override
 	public String toString() {

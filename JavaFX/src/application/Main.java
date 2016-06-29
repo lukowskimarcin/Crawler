@@ -11,6 +11,12 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			
+			primaryStage.setTitle("Crawler");
+			primaryStage.setResizable(false);
+			primaryStage.setHeight(150);
+			primaryStage.setWidth(300);
+			
 			StackPane root = (StackPane)FXMLLoader.load(getClass().getResource("Sample.fxml"));
 			Scene scene = new Scene(root,400,400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());

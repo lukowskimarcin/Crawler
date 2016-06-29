@@ -18,20 +18,28 @@ public class SampleController {
 
 	@FXML
 	private Button button;
+	
+	@FXML
+	private Button stop;
 
 	@FXML
 	private ProgressIndicator indicator;
 
 	@FXML
 	private ProgressBar progressBar;
-
-	@FXML
-	void onAction(ActionEvent event) {
+	
+	private IWebCrawler<List<Proxy>> proxyWebCrawler;
+	
+	public SampleController() {
 		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
 		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
 
-		IWebCrawler<List<Proxy>> proxyWebCrawler = new WebCrawler<List<Proxy>>(8);
-
+		 
+	}
+	
+	private void init() {
+		proxyWebCrawler = new WebCrawler<List<Proxy>>(8);
+		
 		proxyWebCrawler.addOnCrawlingFinishedListener(e -> {
 			System.out.println("FINISHED " + String.format("[%.2f sec] !!!", e.getElapsedTime() * 1.0 / 1000) );
 			progressBar.setProgress(1.0);
@@ -44,23 +52,24 @@ public class SampleController {
 		
 
 		proxyWebCrawler.addOnCrawlingChangeStateListener(e -> {
-			if (e.getTotalPages() != 0) {
-				double percent = 1.0 * (e.getCompletePages() + e.getErrorPages() + e.getProcessingPages())
-						/ e.getTotalPages();
-
-				if (button.isDisable() && percent == 1.0) {
-					percent = 0.99;
-				}
-				progressBar.setProgress(percent);
-				indicator.setProgress(percent);
-			}
+			progressBar.setProgress(e.getProgress());
+			indicator.setProgress(e.getProgress());
 		});
+	}
+	
 
+	@FXML
+	void onStartAction(ActionEvent event) {
+		init();
+		
 		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com");
 		proxyWebCrawler.addTask(rootTask);
-
 		button.setDisable(true);
-
 	}
 
+	@FXML
+	void onStopAction(ActionEvent event) {
+		button.setDisable(false);
+		proxyWebCrawler.shutdownAndAwaitTermination();
+	}
 }
