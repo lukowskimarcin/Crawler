@@ -3,6 +3,7 @@ package application;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -16,6 +17,10 @@ public class Main extends Application {
 			primaryStage.setResizable(false);
 			primaryStage.setHeight(150);
 			primaryStage.setWidth(300);
+			
+			
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("../resource/icon.png")));
+			
 			
 			StackPane root = (StackPane)FXMLLoader.load(getClass().getResource("Sample.fxml"));
 			Scene scene = new Scene(root,400,400);
