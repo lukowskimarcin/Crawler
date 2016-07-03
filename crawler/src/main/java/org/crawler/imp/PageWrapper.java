@@ -2,6 +2,10 @@ package org.crawler.imp;
 
 import java.io.Serializable;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+
 /**
  * Przetwarzana strona
  * @author Marcin
@@ -11,9 +15,16 @@ import java.io.Serializable;
 public class PageWrapper<T> implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
+	@Attribute
 	private String url;
+	
+	@Element(required=false)
 	private String errorMessage;
+	
+	@Attribute
 	private int level;
+	
+	@Element(required=false)
 	private T data;
 	
 	public PageWrapper(String url) {

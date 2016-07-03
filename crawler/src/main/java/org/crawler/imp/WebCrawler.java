@@ -19,38 +19,49 @@ import org.crawler.ICrawlTask;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
 import org.crawler.events.WebCrawlerEvent;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron
  * @author Marcin
  *
  */
+@Root
 public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawler<T>   {
 	
 	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
 	//Strony już odwiedzone
-	private final Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
-	 
-	//Strony dla których byly bledy 
-	private final List<PageWrapper<T>> errorPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	@ElementList(required=false)
+	private Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
 	
+	//Strony dla których byly bledy
+	@ElementList(required=false, entry="page", empty=false)
+	private List<PageWrapper<T>> errorPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+		
 	//Poprawnie przetworzone strony
-	private final List<PageWrapper<T>> completePages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	@ElementList(required=false, entry="page", empty=false)
+	private List<PageWrapper<T>> completePages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
 	//Strony aktualnie przetwarzane
-	private final List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
+	@ElementList(required=false, entry="page", empty=false)
+	private List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
-	private final List<ICrawlTask<T>> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask<T>>());
+	private List<ICrawlTask<T>> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask<T>>());
 	
-	private final List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
+	private List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
 	
 	private ProxyManager proxyManager;
 	
 	private ExecutorService pool;
 	
+	@Attribute(required=false)
 	private Long startTime = null;
 	
+	@Attribute(required=false)
 	private Long endTime = null;
 	
 	
@@ -220,8 +231,8 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	}
 	
 	private long getElapsedTime(){
-		endTime = System.currentTimeMillis();
 		if(startTime!=null) {
+			endTime = System.currentTimeMillis();
 			return endTime-startTime;
 		}
 		return -1;
