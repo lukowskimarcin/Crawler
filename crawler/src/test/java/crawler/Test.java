@@ -22,7 +22,7 @@ public class Test {
 	
 	
 	Serializer serializer = new Persister();
-	File result = new File("e:/example.xml");
+	File result = new File("g:/example.xml");
 
 	serializer.write(crawler, result);
 	

@@ -20,7 +20,6 @@ import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
 import org.crawler.events.WebCrawlerEvent;
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -50,6 +49,7 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	@ElementList(required=false, entry="page", empty=false)
 	private List<PageWrapper<T>> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper<T>>());
 	
+	@ElementList(required=false, entry="page", empty=false)
 	private List<ICrawlTask<T>> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask<T>>());
 	
 	private List<Future<T>> futures = Collections.synchronizedList(new ArrayList<Future<T>>());
