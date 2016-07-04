@@ -58,6 +58,12 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 	
 	private ExecutorService pool;
 	
+	private List<IEventListener<WebCrawlerEvent>> onCrawlingFinishedListener;
+	
+	private List<IEventListener<WebCrawlerEvent>> onCrawlingChangeStateListener;
+	
+	private List<IEventListener<ICrawlTask<T>>> onTaskRejectedListener;
+	
 	@Attribute(required=false)
 	private Long startTime = null;
 	
@@ -251,7 +257,7 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 		return event;
 	}
 	
-	private List<IEventListener<WebCrawlerEvent>> onCrawlingFinishedListener;
+	
 	
 	@Override
 	public void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener) {
@@ -277,7 +283,7 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 		}
 	}
 	
-	private List<IEventListener<WebCrawlerEvent>> onCrawlingChangeStateListener;
+	
 	
 	@Override
 	public void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener) {
@@ -298,9 +304,6 @@ public class WebCrawler<T> extends CrawlTaskBaseListener<T> implements IWebCrawl
 			}
 		}
 	}
-	
-	
-	private List<IEventListener<ICrawlTask<T>>> onTaskRejectedListener;
 	
 	@Override
 	public void addOnTaskRejectedListener(IEventListener<ICrawlTask<T>> listener) {

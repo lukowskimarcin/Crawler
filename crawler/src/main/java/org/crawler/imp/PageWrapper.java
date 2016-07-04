@@ -27,6 +27,9 @@ public class PageWrapper<T> implements Serializable {
 	@Element(required=false)
 	private T data;
 	
+	public PageWrapper(){
+	}
+	
 	public PageWrapper(String url) {
 		this(url, 0);
 	}
@@ -76,5 +79,14 @@ public class PageWrapper<T> implements Serializable {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	@Override
+	public String toString() {
+		return "Page [" +
+				"\n\turl: " + url +
+				"\n\tlevel: " + level +
+				"\n\terrorMessage: " + errorMessage +
+				"\n\tdata: " + data + "\n]";
 	}
 }
