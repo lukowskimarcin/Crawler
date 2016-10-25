@@ -11,86 +11,86 @@ import org.crawler.events.CrawlTaskEvent;
  * Podstawowe zdarzenia obslugiwane przez przetwarzane strony
  * @author Marcin
  *
- * @param <T>
+ * @param 
  */
-public class CrawlTaskBaseListener<T> implements ICrawlTaskListener<T> {
+public class CrawlTaskBaseListener implements ICrawlTaskListener {
 	
-	protected List<IEventListener<CrawlTaskEvent<T>>> onPageCrawlingStartListener;
-	protected List<IEventListener<CrawlTaskEvent<T>>> onPageCrawlingCompletedListener;
-	protected List<IEventListener<CrawlTaskEvent<T>>> onPageCrawlingFailedListener;
-	protected List<IEventListener<CrawlTaskEvent<T>>> onPageAlreadyVisitedListener;
-	protected List<IEventListener<CrawlTaskEvent<T>>> onPageProcessingProgressListener;
+	protected List<IEventListener<CrawlTaskEvent>> onPageCrawlingStartListener;
+	protected List<IEventListener<CrawlTaskEvent>> onPageCrawlingCompletedListener;
+	protected List<IEventListener<CrawlTaskEvent>> onPageCrawlingFailedListener;
+	protected List<IEventListener<CrawlTaskEvent>> onPageAlreadyVisitedListener;
+	protected List<IEventListener<CrawlTaskEvent>> onPageProcessingProgressListener;
 
 	@Override
-	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingStartListener() {
+	public List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingStartListener() {
 		return onPageCrawlingStartListener;
 	}
 	
 	@Override
-	public void addOnPageCrawlingStartListener(IEventListener<CrawlTaskEvent<T>> listener) {
+	public void addOnPageCrawlingStartListener(IEventListener<CrawlTaskEvent> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingStartListener==null) {
-				onPageCrawlingStartListener = new ArrayList<IEventListener<CrawlTaskEvent<T>>>();
+				onPageCrawlingStartListener = new ArrayList<IEventListener<CrawlTaskEvent>>();
 			}
 			onPageCrawlingStartListener.add(listener);
 		}
 	}
 	
 	@Override
-	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingCompletedListener() {
+	public List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingCompletedListener() {
 		return onPageCrawlingCompletedListener;
 	}
 	
 	@Override
-	public void addOnPageCrawlingCompletedListener(IEventListener<CrawlTaskEvent<T>> listener) {
+	public void addOnPageCrawlingCompletedListener(IEventListener<CrawlTaskEvent> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingCompletedListener==null) {
-				onPageCrawlingCompletedListener = new ArrayList<IEventListener<CrawlTaskEvent<T>>>();
+				onPageCrawlingCompletedListener = new ArrayList<IEventListener<CrawlTaskEvent>>();
 			}
 			onPageCrawlingCompletedListener.add(listener);
 		}
 	}
 	 
 	@Override
-	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingFailedListener() {
+	public List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingFailedListener() {
 		return onPageCrawlingFailedListener;
 	}
 	
 	@Override
-	public void addOnPageCrawlingFailedListener(IEventListener<CrawlTaskEvent<T>> listener) {
+	public void addOnPageCrawlingFailedListener(IEventListener<CrawlTaskEvent> listener) {
 		if(listener!=null) {
 			if(onPageCrawlingFailedListener==null) {
-				onPageCrawlingFailedListener = new ArrayList<IEventListener<CrawlTaskEvent<T>>>();
+				onPageCrawlingFailedListener = new ArrayList<IEventListener<CrawlTaskEvent>>();
 			}
 			onPageCrawlingFailedListener.add(listener);
 		}
 	}
 	
 	@Override
-	public List<IEventListener<CrawlTaskEvent<T>>> getOnAlreadyVisitedListener() {
+	public List<IEventListener<CrawlTaskEvent>> getOnAlreadyVisitedListener() {
 		return onPageAlreadyVisitedListener;
 	}
 	
 	@Override
-	public void addOnAlreadyVisitedListener(IEventListener<CrawlTaskEvent<T>> listener) {
+	public void addOnAlreadyVisitedListener(IEventListener<CrawlTaskEvent> listener) {
 		if(listener!=null) {
 			if(onPageAlreadyVisitedListener==null) {
-				onPageAlreadyVisitedListener = new ArrayList<IEventListener<CrawlTaskEvent<T>>>();
+				onPageAlreadyVisitedListener = new ArrayList<IEventListener<CrawlTaskEvent>>();
 			}
 			onPageAlreadyVisitedListener.add(listener);
 		}
 	}
 	
 	@Override
-	public List<IEventListener<CrawlTaskEvent<T>>> getOnPageProcessingProgressListener() {
+	public List<IEventListener<CrawlTaskEvent>> getOnPageProcessingProgressListener() {
 		return onPageProcessingProgressListener;
 	}
 	
 	@Override
-	public void addOnPageProcessingProgressListener(IEventListener<CrawlTaskEvent<T>> listener) {
+	public void addOnPageProcessingProgressListener(IEventListener<CrawlTaskEvent> listener) {
 		if(listener!=null) {
 			if(onPageProcessingProgressListener==null) {
-				onPageProcessingProgressListener = new ArrayList<IEventListener<CrawlTaskEvent<T>>>();
+				onPageProcessingProgressListener = new ArrayList<IEventListener<CrawlTaskEvent>>();
 			}
 			onPageProcessingProgressListener.add(listener);
 		}

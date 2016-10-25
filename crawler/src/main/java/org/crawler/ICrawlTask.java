@@ -1,6 +1,6 @@
 package org.crawler;
 
-import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import org.crawler.imp.PageWrapper;
 
@@ -9,13 +9,13 @@ import org.crawler.imp.PageWrapper;
  * @author Marcin
  *
  */
-public interface ICrawlTask<T> extends Callable<T>   {
+public interface ICrawlTask  extends Runnable  {
 	
 	/**
 	 * Metoda inicjuje zadanie do wykonania
 	 * @param webCrawler crawler, który ma wykonać zadanie
 	 */
-	void init(IWebCrawler<T> webCrawler);
+	void init(IWebCrawler webCrawler);
 	
 	/**
 	 * Metoda przetwarzająca stronę
@@ -26,5 +26,5 @@ public interface ICrawlTask<T> extends Callable<T>   {
 	 * Metoda zwraca sotrone zgloszona do zadania
 	 * @return
 	 */
-	PageWrapper<T> getPage();
+	PageWrapper getPage();
 }

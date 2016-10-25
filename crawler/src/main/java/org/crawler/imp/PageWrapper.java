@@ -12,7 +12,7 @@ import org.simpleframework.xml.Root;
  *
  * @param <T> typ danych pobierany dla strony
  */
-public class PageWrapper<T> implements Serializable {
+public class PageWrapper implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
 	@Attribute
@@ -23,9 +23,10 @@ public class PageWrapper<T> implements Serializable {
 	
 	@Attribute
 	private int level;
-	
+
 	@Element(required=false)
-	private T data;
+	private Object data;
+	
 	
 	public PageWrapper(){
 	}
@@ -46,15 +47,8 @@ public class PageWrapper<T> implements Serializable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		PageWrapper<?> second = (PageWrapper<?>) obj;
+		PageWrapper second = (PageWrapper) obj;
 		return  url.equals(second.getUrl());
-	}
-	
-	public T getData() {
-		return data;
-	}
-	public void setData(T data) {
-		this.data = data;
 	}
 	
 	public String getUrl() {
@@ -81,12 +75,12 @@ public class PageWrapper<T> implements Serializable {
 		this.level = level;
 	}
 	
+	
 	@Override
 	public String toString() {
 		return "Page [" +
 				"\n\turl: " + url +
 				"\n\tlevel: " + level +
-				"\n\terrorMessage: " + errorMessage +
-				"\n\tdata: " + data + "\n]";
+				"\n\terrorMessage: " + errorMessage + "\n]";
 	}
 }

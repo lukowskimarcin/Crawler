@@ -2,8 +2,9 @@ package org.crawler.app;
 
 import java.util.List;
 
+import org.crawler.IWebCrawler;
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.Proxy;
+import org.crawler.utils.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -12,7 +13,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
+public class ProxyCentrumPagesCrawler extends CrawlTask {
 	private static final long serialVersionUID = 1610323384868842390L;
 
 	public ProxyCentrumPagesCrawler(String url){
@@ -44,7 +45,19 @@ public class ProxyCentrumPagesCrawler extends CrawlTask<List<Proxy>> {
 		}
 		
 		webClient.close();
-		page.setData(null);
+		//page.setData(null);
+		
+	}
+
+	@Override
+	public void init(IWebCrawler webCrawler) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void consumePageData() {
+		// TODO Auto-generated method stub
 		
 	}
 

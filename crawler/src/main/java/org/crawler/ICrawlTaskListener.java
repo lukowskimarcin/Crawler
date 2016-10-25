@@ -8,47 +8,47 @@ import org.crawler.events.CrawlTaskEvent;
  * Podstawowe zdarzenia dla przetwarzania stron
  * @author Marcin
  *
- * @param <T>
+ * @param 
  */
-public interface ICrawlTaskListener<T> {
+public interface ICrawlTaskListener {
 	/**
 	 * Początek przetwarzania strony
 	 * @param listener
 	 */
-	void addOnPageCrawlingStartListener(IEventListener<CrawlTaskEvent<T>> listener);
+	void addOnPageCrawlingStartListener(IEventListener<CrawlTaskEvent> listener);
 	
-	List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingStartListener();
+	List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingStartListener();
 	
 	/**
 	 * Zakończenie przetwarzania strony
 	 * @param listener
 	 */
-	void addOnPageCrawlingCompletedListener(IEventListener<CrawlTaskEvent<T>> listener);
+	void addOnPageCrawlingCompletedListener(IEventListener<CrawlTaskEvent> listener);
 	
-	List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingCompletedListener();
+	List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingCompletedListener();
 	
 	/**
 	 * Błąd przetwarzania strony
 	 * @param listener
 	 */
-	void addOnPageCrawlingFailedListener(IEventListener<CrawlTaskEvent<T>> listener);
+	void addOnPageCrawlingFailedListener(IEventListener<CrawlTaskEvent> listener);
 	
 	
-	List<IEventListener<CrawlTaskEvent<T>>> getOnPageCrawlingFailedListener();
+	List<IEventListener<CrawlTaskEvent>> getOnPageCrawlingFailedListener();
 	
 	/**
 	 * Strona była juz zgłaszana do przetworzenia
 	 * @param listener
 	 */
-	void addOnAlreadyVisitedListener(IEventListener<CrawlTaskEvent<T>> listener);
+	void addOnAlreadyVisitedListener(IEventListener<CrawlTaskEvent> listener);
 	
-	List<IEventListener<CrawlTaskEvent<T>>> getOnAlreadyVisitedListener();
+	List<IEventListener<CrawlTaskEvent>> getOnAlreadyVisitedListener();
 	
 	/**
 	 * Postęp przetwarzania strony
 	 * @param listener
 	 */
-	void addOnPageProcessingProgressListener(IEventListener<CrawlTaskEvent<T>> listener);
+	void addOnPageProcessingProgressListener(IEventListener<CrawlTaskEvent> listener);
 	
-	List<IEventListener<CrawlTaskEvent<T>>> getOnPageProcessingProgressListener();
+	List<IEventListener<CrawlTaskEvent>> getOnPageProcessingProgressListener();
 }

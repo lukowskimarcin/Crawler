@@ -1,4 +1,4 @@
-package org.crawler.imp;
+package org.crawler.utils;
 
 import java.io.Serializable;
 

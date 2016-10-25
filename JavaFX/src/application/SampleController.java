@@ -5,8 +5,8 @@ import java.util.logging.Level;
 
 import org.crawler.IWebCrawler;
 import org.crawler.app.ProxyCentrumPagesCrawler;
-import org.crawler.imp.Proxy;
 import org.crawler.imp.WebCrawler;
+import org.crawler.utils.Proxy;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,7 +28,7 @@ public class SampleController {
 	@FXML
 	private ProgressBar progressBar;
 	
-	private IWebCrawler<List<Proxy>> proxyWebCrawler;
+	private IWebCrawler proxyWebCrawler;
 	
 	public SampleController() {
 		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
@@ -38,7 +38,7 @@ public class SampleController {
 	}
 	
 	private void init() {
-		proxyWebCrawler = new WebCrawler<List<Proxy>>(8);
+		proxyWebCrawler = new WebCrawler(8);
 		
 		proxyWebCrawler.addOnCrawlingFinishedListener(e -> {
 			System.out.println("FINISHED " + String.format("[%.2f sec] !!!", e.getElapsedTime() * 1.0 / 1000) );

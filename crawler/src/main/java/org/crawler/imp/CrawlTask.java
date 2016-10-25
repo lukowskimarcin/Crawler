@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import org.crawler.ICrawlTask;
 import org.crawler.IEventListener;
-import org.crawler.IWebCrawler;
 import org.crawler.events.CrawlTaskEvent;
 
 /**
@@ -15,14 +14,13 @@ import org.crawler.events.CrawlTaskEvent;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
+public abstract class CrawlTask implements ICrawlTask, Serializable    {
 	private static final long serialVersionUID = 148486884050800551L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
-	
-	protected IWebCrawler<T> webCrawler;
-	protected PageWrapper<T> page;
+	protected WebCrawler webCrawler;
+	protected PageWrapper page;
 	
 	//Poczatek przetwarzania
 	private long startTime;
@@ -31,21 +29,26 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
 	private long endTime;
 	
 	public CrawlTask(String url) {
-		this.page = new PageWrapper<>(url);
+		this.page = new PageWrapper(url);
 	}
 	
-	public CrawlTask(PageWrapper<T> page) {
+	public CrawlTask(PageWrapper page) {
 		this.page = page;
 	}
 	 
 	public abstract void parsePage() throws Exception;
 	
-	public void init(IWebCrawler<T> webCrawler) {
+	
+	public abstract void consumePageData();
+	
+	
+	public void init(WebCrawler webCrawler) {
 		this.webCrawler = webCrawler;
 	}
 	
+	
 	@Override
-	public T call() throws Exception {
+	public void run() {
 		try {
 			if(!webCrawler.isVisited(page)) {
 				webCrawler.addVisited(page);
@@ -61,33 +64,32 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
-		return page.getData();
 	}
 	
-	public PageWrapper<T> getPage() { 
+	public PageWrapper getPage() { 
 		return page;
 	}
 	
-	private void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners) {
+	private void fireEvent(List<IEventListener<CrawlTaskEvent>> listeners) {
 		if(listeners!=null) {
-			CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+			CrawlTaskEvent event = new CrawlTaskEvent(this, page);
 			
-			for(IEventListener<CrawlTaskEvent<T>> callback : listeners){
+			for(IEventListener<CrawlTaskEvent> callback : listeners){
 				callback.handle(event);
 			}
 		}
 	}
 	
-	private void fireEvent(List<IEventListener<CrawlTaskEvent<T>>> listeners, CrawlTaskEvent<T> event ) {
+	private void fireEvent(List<IEventListener<CrawlTaskEvent>> listeners, CrawlTaskEvent event ) {
 		if(listeners!=null) {
-			for(IEventListener<CrawlTaskEvent<T>> callback : listeners){
+			for(IEventListener<CrawlTaskEvent> callback : listeners){
 				callback.handle(event);
 			}
 		}
 	}
 	
 	protected void fireOnPageProcessingProgressEvent(double progress) {
-		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+		CrawlTaskEvent event = new CrawlTaskEvent(this, page);
 		event.setProgress(progress);
 		fireEvent(webCrawler.getOnPageProcessingProgressListener(), event);
 	}
@@ -105,7 +107,7 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
 	protected void fireOnPageCrawlingCompletedEvent(){
 		endTime = System.currentTimeMillis();
 		
-		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page, endTime-startTime);
+		CrawlTaskEvent event = new CrawlTaskEvent(this, page, endTime-startTime);
 		fireEvent(webCrawler.getOnPageCrawlingCompletedListener(), event);
 		 
 		webCrawler.addCompletePage(page);
@@ -114,7 +116,7 @@ public abstract class CrawlTask<T>  implements ICrawlTask<T>, Serializable    {
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
 		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);	
 		
-		CrawlTaskEvent<T> event = new CrawlTaskEvent<T>(this, page);
+		CrawlTaskEvent event = new CrawlTaskEvent(this, page);
 		event.setErrorMessage(ex.getMessage());
 		fireEvent(webCrawler.getOnPageCrawlingFailedListener(), event);
 		 
