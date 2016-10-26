@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.crawler.IWebCrawler;
 import org.crawler.imp.CrawlTask;
+import org.crawler.imp.PageTask;
 import org.crawler.utils.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -13,7 +14,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class ProxyCentrumPagesCrawler extends CrawlTask {
+public class ProxyCentrumPagesCrawler extends PageTask {
 	private static final long serialVersionUID = 1610323384868842390L;
 
 	public ProxyCentrumPagesCrawler(String url){
@@ -21,12 +22,12 @@ public class ProxyCentrumPagesCrawler extends CrawlTask {
 	}
 	
 	@Override
-	public void parsePage() throws Exception {
+	public void parse() throws Exception {
 		WebClient webClient = new WebClient(BrowserVersion.CHROME);
 		webClient.getOptions().setThrowExceptionOnScriptError(false);
 		webClient.getOptions().setCssEnabled(false);
 
-		HtmlPage htmlPage = webClient.getPage(page.getUrl());
+		HtmlPage htmlPage = webClient.getPage(getUrl());
 		
 		HtmlDivision pager = (HtmlDivision) htmlPage.getElementById("pager");
 		for(HtmlElement el : pager.getElementsByTagName("a")) {
@@ -49,14 +50,9 @@ public class ProxyCentrumPagesCrawler extends CrawlTask {
 		
 	}
 
-	@Override
-	public void init(IWebCrawler webCrawler) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
-	public void consumePageData() {
+	public void process() {
 		// TODO Auto-generated method stub
 		
 	}

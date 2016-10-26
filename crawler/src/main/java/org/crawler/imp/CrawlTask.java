@@ -5,15 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.crawler.ICrawlTask;
 import org.crawler.IEventListener;
 import org.crawler.events.CrawlTaskEvent;
 
-/**
- * Zadanie parsowania strony
- *
- * @param <TPage> Typ obslugiwanej strony
- */
 public class CrawlTask implements Runnable, Serializable    {
 	private static final long serialVersionUID = 148486884050800551L;
 

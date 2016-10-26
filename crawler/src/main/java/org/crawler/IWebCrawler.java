@@ -10,19 +10,6 @@ import org.crawler.imp.PageTask;
 public interface IWebCrawler extends ICrawlTaskListener {
 
 	/**
-	 * Metoda Sprawdza czy strona byla przetwarzana
-	 * @param page
-	 * @return
-	 */
-	boolean isVisited(PageTask page);
-	
-	/**
-	 * Metoda oznacza stronę jako przetworzoną
-	 * @param page
-	 */
-	void addVisited(PageTask page);
-	
-	/**
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
@@ -33,12 +20,6 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	void shutdown();
 	
 	void shutdownAndAwaitTermination(); 
-	
-	void addCompletePage(PageTask page);
-	
-	void addProcessingPage(PageTask page);
-	
-	void addErrorPage(PageTask page);
 	
 	List<PageTask> getCompletePages();
 	
@@ -53,7 +34,9 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	void cancel();
 	
 	void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener);
+
 	void addOnTaskRejectedListener(IEventListener<CrawlTask> listener);
+	
 	void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener);
 	
 }
