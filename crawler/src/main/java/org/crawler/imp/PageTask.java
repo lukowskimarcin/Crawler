@@ -4,15 +4,13 @@ import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
 
 /**
  * Przetwarzana strona
  * @author Marcin
  *
- * @param <T> typ danych pobierany dla strony
  */
-public class PageWrapper implements Serializable {
+public abstract class PageTask implements Serializable {
 	private static final long serialVersionUID = 6857632664456273402L;
 	
 	@Attribute
@@ -27,15 +25,11 @@ public class PageWrapper implements Serializable {
 	@Element(required=false)
 	private Object data;
 	
-	
-	public PageWrapper(){
-	}
-	
-	public PageWrapper(String url) {
+	public PageTask(String url) {
 		this(url, 0);
 	}
 	
-	public PageWrapper(String url, int level) {
+	public PageTask(String url, int level) {
 		this.url = url;
 		this.level = level;
 	}
@@ -47,7 +41,7 @@ public class PageWrapper implements Serializable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		PageWrapper second = (PageWrapper) obj;
+		PageTask second = (PageTask) obj;
 		return  url.equals(second.getUrl());
 	}
 	
@@ -75,12 +69,24 @@ public class PageWrapper implements Serializable {
 		this.level = level;
 	}
 	
+	/**
+	 * Przetwarzanie danych strony po pobraniu
+	 */
+	public abstract void process();  
 	
+	
+	/**
+	 * Pobieranie danych ze strony
+	 */
+	public abstract void parse() throws Exception;
+	
+
 	@Override
 	public String toString() {
 		return "Page [" +
 				"\n\turl: " + url +
 				"\n\tlevel: " + level +
-				"\n\terrorMessage: " + errorMessage + "\n]";
+				"\n\terrorMessage: " + errorMessage + 
+				"\n\tdata: " + data + "\n]";
 	}
 }

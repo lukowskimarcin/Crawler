@@ -1,13 +1,13 @@
 package org.crawler.events;
 
-import org.crawler.ICrawlTask;
-import org.crawler.imp.PageWrapper;
+import org.crawler.imp.CrawlTask;
+import org.crawler.imp.PageTask;
 
 public class CrawlTaskEvent {
 	
-	private ICrawlTask task;
+	private CrawlTask task;
 	
-	private PageWrapper page;
+	private PageTask page;
 	
 	//czas w ms
 	private long time;
@@ -16,25 +16,25 @@ public class CrawlTaskEvent {
 	
 	private String errorMessage;
 
-	public CrawlTaskEvent(ICrawlTask task, PageWrapper page, long time) {
+	public CrawlTaskEvent(CrawlTask task, PageTask page, long time) {
 		this.task = task;
 		this.page = page;
 		this.time = time;
 	}
 	
 	
-	public CrawlTaskEvent(ICrawlTask task, PageWrapper page) {
+	public CrawlTaskEvent(CrawlTask task, PageTask page) {
 		this.task = task;
 		this.page = page;
 		this.time = -1;
 	}
 
 
-	public ICrawlTask getTask() {
+	public CrawlTask getTask() {
 		return task;
 	}
 
-	public PageWrapper getPage() {
+	public PageTask getPage() {
 		return page;
 	}
 

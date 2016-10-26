@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.crawler.events.WebCrawlerEvent;
-import org.crawler.imp.PageWrapper;
+import org.crawler.imp.CrawlTask;
+import org.crawler.imp.PageTask;
 
 public interface IWebCrawler extends ICrawlTaskListener {
 
@@ -13,46 +14,46 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	 * @param page
 	 * @return
 	 */
-	boolean isVisited(PageWrapper page);
+	boolean isVisited(PageTask page);
 	
 	/**
 	 * Metoda oznacza stronę jako przetworzoną
 	 * @param page
 	 */
-	void addVisited(PageWrapper page);
+	void addVisited(PageTask page);
 	
 	/**
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
-	void addTask(ICrawlTask task);
+	void addTask(PageTask page);
 	
-	void addTask(Collection<ICrawlTask> tasks);
+	void addTask(Collection<PageTask> pages);
 	
 	void shutdown();
 	
 	void shutdownAndAwaitTermination(); 
 	
-	void addCompletePage(PageWrapper page);
+	void addCompletePage(PageTask page);
 	
-	void addProcessingPage(PageWrapper page);
+	void addProcessingPage(PageTask page);
 	
-	void addErrorPage(PageWrapper page);
+	void addErrorPage(PageTask page);
 	
-	List<PageWrapper> getCompletePages();
+	List<PageTask> getCompletePages();
 	
-	List<PageWrapper> getErrorPages();
+	List<PageTask> getErrorPages();
 	
-	List<PageWrapper> getProcesingPages();
+	List<PageTask> getProcesingPages();
 	
-	List<ICrawlTask> getRejectedTasks();
+	List<CrawlTask> getRejectedTasks();
 	
 	void waitUntilFinish();
 	
 	void cancel();
 	
 	void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener);
-	void addOnTaskRejectedListener(IEventListener<ICrawlTask> listener);
+	void addOnTaskRejectedListener(IEventListener<CrawlTask> listener);
 	void addOnCrawlingFinishedListener(IEventListener<WebCrawlerEvent> listener);
 	
 }

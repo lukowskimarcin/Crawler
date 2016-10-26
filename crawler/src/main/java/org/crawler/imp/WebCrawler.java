@@ -15,46 +15,37 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.crawler.ICrawlTask;
 import org.crawler.ICrawlTaskListener;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
 import org.crawler.events.WebCrawlerEvent;
+import org.crawler.listeners.CrawlTaskBaseListener;
 import org.crawler.utils.ProxyManager;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
 
 /**
  * Klasa  zarządzająca porocesem przetwarzania stron
  * @author Marcin
  *
  */
-@Root
 public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, ICrawlTaskListener   {
 	
 	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
 	//Strony już odwiedzone
-	@ElementList(required=false)
 	private Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
 	
 	//Strony dla których byly bledy
-	@ElementList(required=false, entry="page", empty=false)
-	private List<PageWrapper> errorPages = Collections.synchronizedList(new ArrayList<PageWrapper>());
+	private List<PageTask> errorPages = Collections.synchronizedList(new ArrayList<PageTask>());
 		
 	//Poprawnie przetworzone strony
-	@ElementList(required=false, entry="page", empty=false)
-	private List<PageWrapper> completePages = Collections.synchronizedList(new ArrayList<PageWrapper>());
+	private List<PageTask> completePages = Collections.synchronizedList(new ArrayList<PageTask>());
 	
 	//Strony aktualnie przetwarzane
-	@ElementList(required=false, entry="page", empty=false)
-	private List<PageWrapper> processingPages = Collections.synchronizedList(new ArrayList<PageWrapper>());
+	private List<PageTask> processingPages = Collections.synchronizedList(new ArrayList<PageTask>());
 	
-	@ElementList(required=false, entry="page", empty=false)
-	private List<ICrawlTask> rejectedTasks = Collections.synchronizedList(new ArrayList<ICrawlTask>());
+	private List<CrawlTask> rejectedTasks = Collections.synchronizedList(new ArrayList<CrawlTask>());
 	
-	private List<Future> futures = Collections.synchronizedList(new ArrayList<Future>());
+	private List<Future<?>> futures = Collections.synchronizedList(new ArrayList<Future<?>>());
 	
 	private ProxyManager proxyManager;
 	
@@ -64,12 +55,10 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	
 	private List<IEventListener<WebCrawlerEvent>> onCrawlingChangeStateListener;
 	
-	private List<IEventListener<ICrawlTask>> onTaskRejectedListener;
+	private List<IEventListener<CrawlTask>> onTaskRejectedListener;
 	
-	@Attribute(required=false)
 	private Long startTime = null;
 	
-	@Attribute(required=false)
 	private Long endTime = null;
 	
 	
@@ -109,8 +98,11 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		}
 	}
 	
-	@Override
-	public void addTask(ICrawlTask task) {
+	
+	
+	@Override	
+	public void addTask(PageTask page) {
+		CrawlTask task = new CrawlTask(page);
 		setStartTime();
 		registerTask();
 		task.init(this);
@@ -123,9 +115,10 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public void addTask(Collection<ICrawlTask> tasks){
+	public void addTask(Collection<PageTask> pages){
 		setStartTime();
-		for(ICrawlTask task : tasks) {
+		for(PageTask page : pages) {
+			CrawlTask task = new CrawlTask(page);
 			registerTask();
 			task.init(this);
 			try {
@@ -150,13 +143,13 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	
 	@Override
 	public void cancel() {
-		for(Future f : futures) {
+		for(Future<?> f : futures) {
 			f.cancel(false);
 		}
 		pool.shutdown();
 	}
 	
-	public boolean isVisited(PageWrapper page) {
+	public boolean isVisited(PageTask page) {
 		boolean result = visitedPages.contains(page.getUrl());
 		if(result){
 			unRegisterTask();
@@ -164,7 +157,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		return result;
 	}
 
-	public synchronized void addVisited(PageWrapper page) {
+	public synchronized void addVisited(PageTask page) {
 		visitedPages.add(page.getUrl());
 		fireOnCrawlingChangeStateEvent();
 	}
@@ -178,7 +171,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	 
-	public synchronized void addErrorPage(PageWrapper page) {
+	public synchronized void addErrorPage(PageTask page) {
 		processingPages.remove(page);
 		errorPages.add(page);
 		unRegisterTask();
@@ -186,21 +179,21 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<PageWrapper> getErrorPages(){
+	public List<PageTask> getErrorPages(){
 		return errorPages;
 	}
 	
-	private void addRejectedTask(ICrawlTask task) {
+	private void addRejectedTask(CrawlTask task) {
 		rejectedTasks.add(task);
 		fireOnCrawlingChangeStateEvent();
 	}
 	
 	@Override
-	public List<ICrawlTask> getRejectedTasks(){
+	public List<CrawlTask> getRejectedTasks(){
 		return rejectedTasks;
 	}
 	
-	public synchronized void addCompletePage(PageWrapper page) {
+	public synchronized void addCompletePage(PageTask page) {
 		processingPages.remove(page);
 		completePages.add(page);
 		unRegisterTask();
@@ -208,16 +201,16 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<PageWrapper> getCompletePages() {
+	public List<PageTask> getCompletePages() {
 		return completePages;
 	}
 
-	public synchronized void addProcessingPage(PageWrapper page) {
+	public synchronized void addProcessingPage(PageTask page) {
 		processingPages.add(page);
 	}
 	
 	@Override
-	public List<PageWrapper> getProcesingPages() {
+	public List<PageTask> getProcesingPages() {
 		return processingPages;
 	}
 	
@@ -309,20 +302,20 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public void addOnTaskRejectedListener(IEventListener<ICrawlTask> listener) {
+	public void addOnTaskRejectedListener(IEventListener<CrawlTask> listener) {
 		if(listener!=null) {
 			if(onTaskRejectedListener==null) {
-				onTaskRejectedListener = new ArrayList<IEventListener<ICrawlTask>>();
+				onTaskRejectedListener = new ArrayList<IEventListener<CrawlTask>>();
 			}
 			onTaskRejectedListener.add(listener);
 		}
 	}
 	
-	protected void fireOnTaskRejected(ICrawlTask task){
+	protected void fireOnTaskRejected(CrawlTask task){
 		addRejectedTask(task);
 		unRegisterTask();
 		if(onTaskRejectedListener!=null) {
-			for(IEventListener<ICrawlTask> callback : onTaskRejectedListener){
+			for(IEventListener<CrawlTask> callback : onTaskRejectedListener){
 				callback.handle(task);
 			}
 		}

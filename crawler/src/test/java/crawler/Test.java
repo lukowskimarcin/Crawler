@@ -3,7 +3,7 @@ package crawler;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
 import org.crawler.events.CrawlTaskEvent;
-import org.crawler.imp.PageWrapper;
+import org.crawler.imp.PageTask;
 import org.crawler.imp.WebCrawler;
 
 public class Test {
@@ -22,7 +22,6 @@ public class Test {
 			}
 		});
 		
-		PageWrapper  xx = new PageWrapper("www.wp.pl");
 		
 
 		

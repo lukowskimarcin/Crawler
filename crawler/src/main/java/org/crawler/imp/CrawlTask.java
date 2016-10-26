@@ -14,13 +14,13 @@ import org.crawler.events.CrawlTaskEvent;
  *
  * @param <TPage> Typ obslugiwanej strony
  */
-public abstract class CrawlTask implements ICrawlTask, Serializable    {
+public class CrawlTask implements Runnable, Serializable    {
 	private static final long serialVersionUID = 148486884050800551L;
 
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
 	protected WebCrawler webCrawler;
-	protected PageWrapper page;
+	protected PageTask page;
 	
 	//Poczatek przetwarzania
 	private long startTime;
@@ -28,24 +28,13 @@ public abstract class CrawlTask implements ICrawlTask, Serializable    {
 	//Koniec przetwarzania
 	private long endTime;
 	
-	public CrawlTask(String url) {
-		this.page = new PageWrapper(url);
-	}
-	
-	public CrawlTask(PageWrapper page) {
+	public CrawlTask(PageTask page) {
 		this.page = page;
 	}
-	 
-	public abstract void parsePage() throws Exception;
-	
-	
-	public abstract void consumePageData();
-	
 	
 	public void init(WebCrawler webCrawler) {
 		this.webCrawler = webCrawler;
 	}
-	
 	
 	@Override
 	public void run() {
@@ -55,7 +44,7 @@ public abstract class CrawlTask implements ICrawlTask, Serializable    {
 				
 				fireOnPageCrawlingStartEvent();
 				
-				parsePage();	
+				page.parse();
 				
 				fireOnPageCrawlingCompletedEvent();
 			} else {
@@ -64,10 +53,6 @@ public abstract class CrawlTask implements ICrawlTask, Serializable    {
 		}catch (Exception ex) {
 			fireOnPageCrawlingFailedEvent(ex);
 		}
-	}
-	
-	public PageWrapper getPage() { 
-		return page;
 	}
 	
 	private void fireEvent(List<IEventListener<CrawlTaskEvent>> listeners) {
@@ -122,4 +107,5 @@ public abstract class CrawlTask implements ICrawlTask, Serializable    {
 		 
 		webCrawler.addErrorPage(page);
 	}
+
 }
