@@ -38,7 +38,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	private List<PageTask> errorPages = Collections.synchronizedList(new ArrayList<PageTask>());
 		
 	//Poprawnie przetworzone strony
-	private List<PageTask> completePages = Collections.synchronizedList(new ArrayList<PageTask>());
+	private List<PageTask> completePages =  Collections.synchronizedList(new ArrayList<PageTask>());
 	
 	//Strony aktualnie przetwarzane
 	private List<PageTask> processingPages = Collections.synchronizedList(new ArrayList<PageTask>());
