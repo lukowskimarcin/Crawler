@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.crawler.IWebCrawler;
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.PageTask;
+import org.crawler.imp.CrawlTask;
 import org.crawler.utils.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -14,7 +14,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class ProxyCentrumPagesCrawler extends PageTask {
+public class ProxyCentrumPagesCrawler extends CrawlTask {
 	private static final long serialVersionUID = 1610323384868842390L;
 
 	public ProxyCentrumPagesCrawler(String url){

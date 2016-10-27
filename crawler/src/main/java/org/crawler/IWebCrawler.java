@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.crawler.events.WebCrawlerEvent;
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.PageTask;
 
 public interface IWebCrawler extends ICrawlTaskListener {
 
@@ -13,19 +12,19 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	 * Metoda przekazuje zadanie do puli do wykonania
 	 * @param task:	
 	 */
-	void addTask(PageTask page);
+	void addTask(CrawlTask page);
 	
-	void addTask(Collection<PageTask> pages);
+	void addTask(Collection<CrawlTask> pages);
 	
 	void shutdown();
 	
 	void shutdownAndAwaitTermination(); 
 	
-	List<PageTask> getCompletePages();
+	List<CrawlTask> getCompletePages();
 	
-	List<PageTask> getErrorPages();
+	List<CrawlTask> getErrorPages();
 	
-	List<PageTask> getProcesingPages();
+	List<CrawlTask> getProcesingPages();
 	
 	List<CrawlTask> getRejectedTasks();
 	

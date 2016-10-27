@@ -38,7 +38,7 @@ public class SampleController {
 	}
 	
 	private void init() {
-		proxyWebCrawler = new WebCrawler(8);
+		proxyWebCrawler = WebCrawler.getInstance();
 		
 		proxyWebCrawler.addOnCrawlingFinishedListener(e -> {
 			System.out.println("FINISHED " + String.format("[%.2f sec] !!!", e.getElapsedTime() * 1.0 / 1000) );

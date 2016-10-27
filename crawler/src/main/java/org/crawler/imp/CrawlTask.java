@@ -7,38 +7,108 @@ import java.util.logging.Logger;
 
 import org.crawler.IEventListener;
 import org.crawler.events.CrawlTaskEvent;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 
-public class CrawlTask implements Runnable, Serializable    {
-	private static final long serialVersionUID = 148486884050800551L;
-
+/**
+ * Przetwarzana strona
+ * @author Marcin
+ *
+ */
+public abstract class CrawlTask implements Runnable, Serializable {
+	private static final long serialVersionUID = 6857632664456273402L;
 	private static final Logger log = Logger.getLogger(CrawlTask.class.getName());   
 	
-	protected WebCrawler webCrawler;
-	protected PageTask page;
+	@Attribute
+	private String url;
+	
+	@Element(required=false)
+	private String errorMessage;
+	
+	@Attribute
+	private int level;
+
+	@Element(required=false)
+	private Object data;
 	
 	//Poczatek przetwarzania
 	private long startTime;
-	
+		
 	//Koniec przetwarzania
 	private long endTime;
 	
-	public CrawlTask(PageTask page) {
-		this.page = page;
+	protected WebCrawler webCrawler = WebCrawler.getInstance();
+	
+	public CrawlTask(String url) {
+		this(url, 0);
 	}
 	
-	public void init(WebCrawler webCrawler) {
-		this.webCrawler = webCrawler;
+	public CrawlTask(String url, int level) {
+		this.url = url;
+		this.level = level;
 	}
+	
+	@Override
+	public int hashCode() {
+		return url.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		CrawlTask second = (CrawlTask) obj;
+		return  url.equals(second.getUrl());
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+	
+	public WebCrawler getWebCrawler() {
+		return webCrawler;
+	}
+
+	 
+	/**
+	 * Przetwarzanie danych strony po pobraniu
+	 */
+	public abstract void process();  
+	
+	
+	/**
+	 * Pobieranie danych ze strony
+	 */
+	public abstract void parse() throws Exception;
+	
 	
 	@Override
 	public void run() {
 		try {
-			if(!webCrawler.isVisited(page)) {
-				webCrawler.addVisited(page);
+			if(!webCrawler.isVisited(this)) {
+				webCrawler.addVisited(this);
 				
 				fireOnPageCrawlingStartEvent();
 				
-				page.parse();
+				parse();
 				
 				fireOnPageCrawlingCompletedEvent();
 			} else {
@@ -51,7 +121,7 @@ public class CrawlTask implements Runnable, Serializable    {
 	
 	private void fireEvent(List<IEventListener<CrawlTaskEvent>> listeners) {
 		if(listeners!=null) {
-			CrawlTaskEvent event = new CrawlTaskEvent(this, page);
+			CrawlTaskEvent event = new CrawlTaskEvent(this);
 			
 			for(IEventListener<CrawlTaskEvent> callback : listeners){
 				callback.handle(event);
@@ -68,7 +138,7 @@ public class CrawlTask implements Runnable, Serializable    {
 	}
 	
 	protected void fireOnPageProcessingProgressEvent(double progress) {
-		CrawlTaskEvent event = new CrawlTaskEvent(this, page);
+		CrawlTaskEvent event = new CrawlTaskEvent(this);
 		event.setProgress(progress);
 		fireEvent(webCrawler.getOnPageProcessingProgressListener(), event);
 	}
@@ -80,26 +150,36 @@ public class CrawlTask implements Runnable, Serializable    {
 	protected void fireOnPageCrawlingStartEvent(){
 		startTime = System.currentTimeMillis();
 		fireEvent(webCrawler.getOnPageCrawlingStartListener());
-		webCrawler.addProcessingPage(page);
+		webCrawler.addProcessingPage(this);
 	}
 	
 	protected void fireOnPageCrawlingCompletedEvent(){
 		endTime = System.currentTimeMillis();
 		
-		CrawlTaskEvent event = new CrawlTaskEvent(this, page, endTime-startTime);
+		CrawlTaskEvent event = new CrawlTaskEvent(this, endTime-startTime);
 		fireEvent(webCrawler.getOnPageCrawlingCompletedListener(), event);
 		 
-		webCrawler.addCompletePage(page);
+		webCrawler.addCompletePage(this);
 	}
 	
 	protected void fireOnPageCrawlingFailedEvent(Exception ex){
 		log.log(Level.SEVERE, "fireOnPageCrawlingFailedEvent", ex);	
 		
-		CrawlTaskEvent event = new CrawlTaskEvent(this, page);
+		CrawlTaskEvent event = new CrawlTaskEvent(this);
 		event.setErrorMessage(ex.getMessage());
 		fireEvent(webCrawler.getOnPageCrawlingFailedListener(), event);
 		 
-		webCrawler.addErrorPage(page);
+		webCrawler.addErrorPage(this);
 	}
 
+	
+
+	@Override
+	public String toString() {
+		return "Page [" +
+				"\n\turl: " + url +
+				"\n\tlevel: " + level +
+				"\n\terrorMessage: " + errorMessage + 
+				"\n\tdata: " + data + "\n]";
+	}
 }
