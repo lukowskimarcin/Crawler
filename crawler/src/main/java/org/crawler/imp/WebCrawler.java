@@ -29,10 +29,6 @@ import org.crawler.utils.ProxyManager;
  */
 public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, ICrawlTaskListener   {
 	
-	
-	private static WebCrawler instance = null;
-	
-	
 	private static final Logger log = Logger.getLogger(WebCrawler.class.getName());   
 	 
 	//Strony już odwiedzone
@@ -72,19 +68,10 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	private AtomicInteger counter;
 	
 	
-	protected WebCrawler(int nThreads) {
+	public WebCrawler(int nThreads) {
 		pool =  Executors.newFixedThreadPool(nThreads);
 		counter = new AtomicInteger(0);
 	}
-	
-	public static WebCrawler getInstance(){
-		if(instance==null) {
-			instance = new WebCrawler(10);
-		}
-		return instance;
-	}
-	
-	
 	
 	public void shutdown() {
 		pool.shutdown();

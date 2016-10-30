@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import org.crawler.IEventListener;
 import org.crawler.events.CrawlTaskEvent;
 import org.simpleframework.xml.Attribute;
@@ -36,8 +38,9 @@ public abstract class CrawlTask implements Runnable, Serializable {
 		
 	//Koniec przetwarzania
 	private long endTime;
-	
-	protected WebCrawler webCrawler = WebCrawler.getInstance();
+
+	@Inject
+	protected WebCrawler webCrawler; 
 	
 	public CrawlTask(String url) {
 		this(url, 0);

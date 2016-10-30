@@ -1,6 +1,6 @@
 package org.crawler.consumer;
 
-public interface Consumer {
+public interface IConsumer {
 	
 	boolean consume();
 	
