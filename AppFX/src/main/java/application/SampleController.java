@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.crawler.IWebCrawler;
 import org.crawler.app.ProxyCentrumPagesCrawler;
+import org.crawler.imp.WebCrawler;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,7 +29,7 @@ public class SampleController {
 	private ProgressBar progressBar;
 	
 	@Inject
-	private IWebCrawler proxyWebCrawler;
+	private WebCrawler proxyWebCrawler;
 	
 	public SampleController() {
 		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);

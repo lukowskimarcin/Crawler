@@ -1,16 +1,20 @@
 package application;
-	
-import javafx.application.Application;
+
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import weld.StartupScene;
 
-
-public class Main extends Application {
-	@Override
-	public void start(Stage primaryStage) {
+public class ApplicationStarter {
+	
+@Inject FXMLLoader fxmlLoader;
+	
+	public void launchJavaFXApplication(@Observes @StartupScene Stage primaryStage) {
 		try {
 			
 			primaryStage.setTitle("Crawler");
@@ -19,7 +23,7 @@ public class Main extends Application {
 			primaryStage.setWidth(300);
 			
 			
-			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("../resource/icon.png")));
+	//		primaryStage.getIcons().add(new Image(ApplicationStarter.class.getResourceAsStream("../resource/icon.png")));
 			
 			
 			StackPane root = (StackPane)FXMLLoader.load(getClass().getResource("Sample.fxml"));
@@ -31,8 +35,5 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args) {
-		launch(args);
-	}
+
 }
