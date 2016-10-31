@@ -25,7 +25,8 @@ public class WeldJavaFXLauncher extends Application {
         WeldContainer weldContainer = CDIUtil.instance().getWeldContainer();
         // Make the application parameters injectable with a standard CDI
         // annotation
-        weldContainer.instance().select(ApplicationParametersProvider.class).get().setParameters(getParameters());
+        CDIUtil.instance().lookup(ApplicationParametersProvider.class).setParameters(getParameters());
+        
         // Now that JavaFX thread is ready
         // let's inform whoever cares using standard CDI notification mechanism:
         // CDI events
