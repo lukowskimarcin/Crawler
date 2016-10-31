@@ -12,11 +12,20 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+
 public class ProxyCentrumDetailCrawler extends CrawlTask {
 	private static final long serialVersionUID = -5028690879897857829L;
 	
-	public ProxyCentrumDetailCrawler(String url, WebCrawler crawler){
+	private TextArea text;
+	
+	
+	public ProxyCentrumDetailCrawler(String url, TextArea text ){
 		super(url);
+		this.text= text;
 	}
 	
 
@@ -42,16 +51,23 @@ public class ProxyCentrumDetailCrawler extends CrawlTask {
 		}
 		
 		webClient.close();
-		//setData(list);
+		setData(list);
 
 	}
 
 	@Override
 	public void process() {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(() -> {
+			List<Proxy> list = (List<Proxy> )getData();
+			String ip = "";
+			if(list!=null){
+				for(Proxy s : list) {
+					ip += s + "\n";
+				}
+				
+			}
+			text.setText(text.getText() + ip);
+		});
 	}
-
-
 
 }

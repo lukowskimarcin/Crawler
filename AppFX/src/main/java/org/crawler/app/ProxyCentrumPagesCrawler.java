@@ -15,12 +15,17 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+
 public class ProxyCentrumPagesCrawler extends CrawlTask {
 	private static final long serialVersionUID = 1610323384868842390L;
 
+	private TextArea text;
 	
-	public ProxyCentrumPagesCrawler(String url){
+	public ProxyCentrumPagesCrawler(String url, TextArea text ){
 		super(url);
+		this.text = text;
 	}
 	
 	@Override
@@ -39,7 +44,7 @@ public class ProxyCentrumPagesCrawler extends CrawlTask {
 				
 				if(href.matches(".*/[0-9]+")) {
 					String url = "http://prx.centrump2p.com" + href;
-					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url, webCrawler);
+					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url, text );
 					webCrawler.addTask(task); 
 				}
 			}catch (Exception ex) {
@@ -56,6 +61,7 @@ public class ProxyCentrumPagesCrawler extends CrawlTask {
 	@Override
 	public void process() {
 		// TODO Auto-generated method stub
+		
 		
 	}
 

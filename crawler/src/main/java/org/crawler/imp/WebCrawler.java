@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.xml.serializer.utils.SerializerMessages_zh_TW;
 import org.crawler.ICrawlTaskListener;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;

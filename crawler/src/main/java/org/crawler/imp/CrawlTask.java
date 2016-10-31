@@ -95,7 +95,14 @@ public abstract class CrawlTask implements Runnable, Serializable {
 	public WebCrawler getWebCrawler() {
 		return webCrawler;
 	}
-
+	
+	public void setData(Object data) {
+		this.data = data;
+	}
+	
+	public Object getData() {
+		return data;
+	}
 	 
 	/**
 	 * Przetwarzanie danych strony po pobraniu

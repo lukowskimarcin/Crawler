@@ -19,8 +19,10 @@ public class WeldJavaFXLauncher extends Application {
     @SuppressWarnings("serial")
     @Override
     public void start(final Stage primaryStage) throws Exception {
+    	
+    	
         // Let's initialize CDI/Weld.
-        WeldContainer weldContainer = new Weld().initialize();
+        WeldContainer weldContainer = CDIUtil.instance().getWeldContainer();
         // Make the application parameters injectable with a standard CDI
         // annotation
         weldContainer.instance().select(ApplicationParametersProvider.class).get().setParameters(getParameters());
