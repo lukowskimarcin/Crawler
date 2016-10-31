@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.xml.serializer.utils.SerializerMessages_zh_TW;
 import org.crawler.ICrawlTaskListener;
 import org.crawler.IEventListener;
 import org.crawler.IWebCrawler;
@@ -101,6 +102,8 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	public void addTask(CrawlTask task) {
 		setStartTime();
 		registerTask();
+		task.init(this);
+		
 		try {
 			Future<?> future = pool.submit(task);
 			futures.add(future);
@@ -114,6 +117,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		setStartTime();
 		for(CrawlTask task : tasks) {
 			registerTask();
+			task.init(this);
 			try {
 				Future<?> future = pool.submit(task);
 				futures.add(future);

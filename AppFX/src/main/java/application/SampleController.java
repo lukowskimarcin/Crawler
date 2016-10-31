@@ -4,7 +4,6 @@ import java.util.logging.Level;
 
 import javax.inject.Inject;
 
-import org.crawler.IWebCrawler;
 import org.crawler.app.ProxyCentrumPagesCrawler;
 import org.crawler.imp.WebCrawler;
 
@@ -15,6 +14,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 
 public class SampleController {
+	
+ 	
+	@Inject WebCrawler crawler;
 
 	@FXML
 	private Button button;
@@ -28,8 +30,7 @@ public class SampleController {
 	@FXML
 	private ProgressBar progressBar;
 	
-	@Inject
-	private WebCrawler proxyWebCrawler;
+	 
 	
 	public SampleController() {
 		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
@@ -37,18 +38,18 @@ public class SampleController {
 	}
 	
 	private void init() {
-		proxyWebCrawler.addOnCrawlingFinishedListener(e -> {
+		crawler.addOnCrawlingFinishedListener(e -> {
 			System.out.println("FINISHED " + String.format("[%.2f sec] !!!", e.getElapsedTime() * 1.0 / 1000) );
 			progressBar.setProgress(1.0);
 			indicator.setProgress(1.0);
 			button.setDisable(false);
 		});
 		
-		proxyWebCrawler.addOnPageCrawlingCompletedListener(e -> 
+		crawler.addOnPageCrawlingCompletedListener(e -> 
 			System.out.println("Page complete " + e.getPage().getUrl() + " [" + e.getTimeSeconds() + " sec]"));
 		
 
-		proxyWebCrawler.addOnCrawlingChangeStateListener(e -> {
+		crawler.addOnCrawlingChangeStateListener(e -> {
 			progressBar.setProgress(e.getProgress());
 			indicator.setProgress(e.getProgress());
 		});
@@ -60,13 +61,13 @@ public class SampleController {
 		init();
 		
 		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com");
-		proxyWebCrawler.addTask(rootTask);
+		crawler.addTask(rootTask);
 		button.setDisable(true);
 	}
 
 	@FXML
 	void onStopAction(ActionEvent event) {
 		button.setDisable(false);
-		proxyWebCrawler.shutdownAndAwaitTermination();
+		crawler.shutdownAndAwaitTermination();
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.crawler.IWebCrawler;
 import org.crawler.imp.CrawlTask;
+import org.crawler.imp.WebCrawler;
 import org.crawler.imp.CrawlTask;
 import org.crawler.utils.Proxy;
 
@@ -17,6 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class ProxyCentrumPagesCrawler extends CrawlTask {
 	private static final long serialVersionUID = 1610323384868842390L;
 
+	
 	public ProxyCentrumPagesCrawler(String url){
 		super(url);
 	}
@@ -37,7 +39,7 @@ public class ProxyCentrumPagesCrawler extends CrawlTask {
 				
 				if(href.matches(".*/[0-9]+")) {
 					String url = "http://prx.centrump2p.com" + href;
-					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url);
+					ProxyCentrumDetailCrawler task = new ProxyCentrumDetailCrawler(url, webCrawler);
 					webCrawler.addTask(task); 
 				}
 			}catch (Exception ex) {

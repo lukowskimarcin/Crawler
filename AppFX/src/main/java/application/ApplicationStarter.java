@@ -1,9 +1,15 @@
 package application;
 
+import java.io.InputStream;
+
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.crawler.app.ProxyCentrumPagesCrawler;
+import org.crawler.imp.WebCrawler;
+
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
@@ -13,6 +19,7 @@ import weld.StartupScene;
 public class ApplicationStarter {
 	
 @Inject FXMLLoader fxmlLoader;
+
 	
 	public void launchJavaFXApplication(@Observes @StartupScene Stage primaryStage) {
 		try {
@@ -25,8 +32,15 @@ public class ApplicationStarter {
 			
 	//		primaryStage.getIcons().add(new Image(ApplicationStarter.class.getResourceAsStream("../resource/icon.png")));
 			
+		 
 			
-			StackPane root = (StackPane)FXMLLoader.load(getClass().getResource("Sample.fxml"));
+		//	ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com");
+		//	crawler.addTask(rootTask);
+			InputStream is = getClass().getResourceAsStream("Sample.fxml");
+			Parent root = (Parent) fxmlLoader.load(is);
+			
+			
+			//StackPane root = (StackPane)fxmlLoader.load(getClass().getResource("Sample.fxml"));
 			Scene scene = new Scene(root,400,400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);

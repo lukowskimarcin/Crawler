@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import org.crawler.IEventListener;
+import org.crawler.IWebCrawler;
 import org.crawler.events.CrawlTaskEvent;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -39,17 +40,22 @@ public abstract class CrawlTask implements Runnable, Serializable {
 	//Koniec przetwarzania
 	private long endTime;
 
-	@Inject
-	protected WebCrawler webCrawler; 
+	protected WebCrawler webCrawler;
 	
 	public CrawlTask(String url) {
-		this(url, 0);
+		this.url = url;
+		this.level = 0;
 	}
 	
-	public CrawlTask(String url, int level) {
+	public CrawlTask(String url,   int level) {
 		this.url = url;
 		this.level = level;
 	}
+	
+	public void init(WebCrawler crawler) {
+		this.webCrawler = crawler;
+	}
+	
 	
 	@Override
 	public int hashCode() {

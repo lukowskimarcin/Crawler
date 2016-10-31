@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.crawler.imp.CrawlTask;
+import org.crawler.imp.WebCrawler;
 import org.crawler.utils.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -14,7 +15,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class ProxyCentrumDetailCrawler extends CrawlTask {
 	private static final long serialVersionUID = -5028690879897857829L;
 	
-	public ProxyCentrumDetailCrawler(String url){
+	public ProxyCentrumDetailCrawler(String url, WebCrawler crawler){
 		super(url);
 	}
 	

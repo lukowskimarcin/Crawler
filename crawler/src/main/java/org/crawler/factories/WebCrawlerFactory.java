@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 
 import org.crawler.imp.WebCrawler;
 
-
+@Singleton
 public class WebCrawlerFactory {
 	
 	private final int THREADS = 10;
