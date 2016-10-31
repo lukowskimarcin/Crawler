@@ -5,14 +5,9 @@ import java.io.InputStream;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.crawler.app.ProxyCentrumPagesCrawler;
-import org.crawler.imp.WebCrawler;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import weld.StartupScene;
 
