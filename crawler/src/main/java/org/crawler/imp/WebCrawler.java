@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,15 +37,15 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	private Set<String> visitedPages = Collections.synchronizedSet(new HashSet<String>());
 	
 	//Strony dla których byly bledy
-	private List<CrawlTask> errorPages = Collections.synchronizedList(new ArrayList<CrawlTask>());
+	private BlockingQueue<CrawlTask> errorPages = new LinkedBlockingQueue<CrawlTask>();
 		
 	//Poprawnie przetworzone strony
-	private List<CrawlTask> completePages =  Collections.synchronizedList(new ArrayList<CrawlTask>());
+	private BlockingQueue<CrawlTask>  completePages = new LinkedBlockingQueue<CrawlTask>();
 	
 	//Strony aktualnie przetwarzane
-	private List<CrawlTask> processingPages = Collections.synchronizedList(new ArrayList<CrawlTask>());
+	private BlockingQueue<CrawlTask> processingPages = new LinkedBlockingQueue<CrawlTask>();
 	
-	private List<CrawlTask> rejectedTasks = Collections.synchronizedList(new ArrayList<CrawlTask>());
+	private BlockingQueue<CrawlTask> rejectedTasks = new LinkedBlockingQueue<CrawlTask>();
 	
 	private List<Future<?>> futures = Collections.synchronizedList(new ArrayList<Future<?>>());
 	
@@ -175,7 +177,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<CrawlTask> getErrorPages(){
+	public BlockingQueue<CrawlTask> getErrorPages(){
 		return errorPages;
 	}
 	
@@ -185,7 +187,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<CrawlTask> getRejectedTasks(){
+	public BlockingQueue<CrawlTask> getRejectedTasks(){
 		return rejectedTasks;
 	}
 	
@@ -197,7 +199,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<CrawlTask> getCompletePages() {
+	public BlockingQueue<CrawlTask> getCompletePages() {
 		return completePages;
 	}
 
@@ -206,7 +208,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	}
 	
 	@Override
-	public List<CrawlTask> getProcesingPages() {
+	public BlockingQueue<CrawlTask> getProcesingPages() {
 		return processingPages;
 	}
 	

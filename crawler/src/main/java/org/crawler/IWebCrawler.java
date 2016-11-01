@@ -2,6 +2,7 @@ package org.crawler;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 import org.crawler.events.WebCrawlerEvent;
 import org.crawler.imp.CrawlTask;
@@ -20,13 +21,13 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	
 	void shutdownAndAwaitTermination(); 
 	
-	List<CrawlTask> getCompletePages();
+	BlockingQueue<CrawlTask> getCompletePages();
 	
-	List<CrawlTask> getErrorPages();
+	BlockingQueue<CrawlTask> getErrorPages();
 	
-	List<CrawlTask> getProcesingPages();
+	BlockingQueue<CrawlTask> getProcesingPages();
 	
-	List<CrawlTask> getRejectedTasks();
+	BlockingQueue<CrawlTask> getRejectedTasks();
 	
 	void waitUntilFinish();
 	

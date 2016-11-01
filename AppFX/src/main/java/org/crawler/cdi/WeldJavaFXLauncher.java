@@ -1,4 +1,4 @@
-package weld;
+package org.crawler.cdi;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

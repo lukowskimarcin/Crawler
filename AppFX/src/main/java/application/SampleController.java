@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import javax.inject.Inject;
 
 import org.crawler.app.ProxyCentrumPagesCrawler;
+import org.crawler.consumer.IConsumer;
 import org.crawler.imp.WebCrawler;
 
 import javafx.application.Platform;
@@ -20,6 +21,10 @@ public class SampleController {
  	
 	@Inject 
 	WebCrawler crawler;
+	
+	@Inject 
+	IConsumer consumer;
+	
 
 	@FXML
 	private Button button;
@@ -49,11 +54,13 @@ public class SampleController {
 			progressBar.setProgress(1.0);
 			indicator.setProgress(1.0);
 			button.setDisable(false);
+			
+			consumer.stopConsumption();
 		});
 		
 		crawler.addOnPageCrawlingCompletedListener(e -> {
 			System.out.println("Page complete " + e.getPage().getUrl() + " [" + e.getTimeSeconds() + " sec]");
-			e.getPage().process();
+			 
 		});
 		
 
@@ -78,6 +85,9 @@ public class SampleController {
 		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com", text);
 		crawler.addTask(rootTask);
 		button.setDisable(true);
+		
+		consumer.startConsumption(1);
+		
 	}
 
 	@FXML

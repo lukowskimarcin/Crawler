@@ -68,6 +68,7 @@ public class ProxyCentrumDetailCrawler extends CrawlTask {
 			}
 			text.setText(text.getText() + ip);
 		});
+		System.out.println("Consume page: " + getUrl());
 	}
 
 }

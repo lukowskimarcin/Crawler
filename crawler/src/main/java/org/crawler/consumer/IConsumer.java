@@ -2,8 +2,8 @@ package org.crawler.consumer;
 
 public interface IConsumer {
 	
-	boolean consume();
+	void startConsumption(int threads);
 	
-	boolean finishConsumption();
+	void stopConsumption();
 
 }

@@ -1,4 +1,4 @@
-package weld;
+package org.crawler.cdi;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;

@@ -1,4 +1,4 @@
-package weld;
+package org.crawler.cdi;
 
 import javafx.application.Application.Parameters;
 
