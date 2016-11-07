@@ -35,7 +35,7 @@ public class ConsumerImpl implements IConsumer {
 		for (ConsumerProcessor proc : procesors) {
 			proc.cancelExecution();
 		}
-		executorService.shutdown();
+		//executorService.shutdown();
 		
 		log.info("stopConsumption !!!");
 	}

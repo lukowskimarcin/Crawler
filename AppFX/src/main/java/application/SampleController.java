@@ -80,6 +80,7 @@ public class SampleController {
 
 	@FXML
 	void onStartAction(ActionEvent event) {
+		crawler.init(10);
 		init();
 		
 		ProxyCentrumPagesCrawler rootTask = new ProxyCentrumPagesCrawler("http://prx.centrump2p.com", text);

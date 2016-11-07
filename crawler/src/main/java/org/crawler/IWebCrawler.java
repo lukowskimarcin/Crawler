@@ -33,6 +33,8 @@ public interface IWebCrawler extends ICrawlTaskListener {
 	
 	void cancel();
 	
+	void init(int nThreads);
+	
 	void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener);
 
 	void addOnTaskRejectedListener(IEventListener<CrawlTask> listener);

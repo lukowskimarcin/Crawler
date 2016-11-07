@@ -63,21 +63,35 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	
 	private Long endTime = null;
 	
-	
 	/**
 	 * Gdy osiągnie zero oznacza koniec przetwarzania
 	 */
 	private AtomicInteger counter;
 	
+	private AtomicInteger completed;
+	
 	
 	public WebCrawler(int nThreads) {
-		pool =  Executors.newFixedThreadPool(nThreads);
-		counter = new AtomicInteger(0);
+		init(nThreads);
 	}
 	
 	public void shutdown() {
 		pool.shutdown();
 	}
+	
+	@Override
+	public void init(int nThreads) {
+		startTime = null;
+		endTime = null;
+		pool =  Executors.newFixedThreadPool(nThreads);
+		counter = new AtomicInteger(0);
+		completed = new AtomicInteger(0);
+		visitedPages = Collections.synchronizedSet(new HashSet<String>());
+		errorPages = new LinkedBlockingQueue<CrawlTask>();
+		completePages = new LinkedBlockingQueue<CrawlTask>();
+		futures = Collections.synchronizedList(new ArrayList<Future<?>>());
+	}
+	
 	
 	public void shutdownAndAwaitTermination() {
 		pool.shutdown(); // Disable new tasks from being submitted
@@ -96,8 +110,6 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 			Thread.currentThread().interrupt();
 		}
 	}
-	
-	
 	
 	@Override	
 	public void addTask(CrawlTask task) {
@@ -194,6 +206,8 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	public synchronized void addCompletePage(CrawlTask page) {
 		processingPages.remove(page);
 		completePages.add(page);
+		completed.incrementAndGet();
+		
 		unRegisterTask();
 		fireOnCrawlingChangeStateEvent();
 	}
@@ -242,7 +256,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	private WebCrawlerEvent createWebCrawlerEvent() {
 		WebCrawlerEvent event = new WebCrawlerEvent();
 		event.setTotalPages(futures.size() + rejectedTasks.size());
-		event.setCompletePages(completePages.size());
+		event.setCompletePages(completed.get());
 		event.setErrorPages(errorPages.size());
 		event.setVisitedPages(visitedPages.size());
 		event.setProcessingPages(processingPages.size());
@@ -250,7 +264,6 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		event.setElapsedTime(getElapsedTime());
 		return event;
 	}
-	
 	
 	
 	@Override
@@ -276,8 +289,6 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 			}
 		}
 	}
-	
-	
 	
 	@Override
 	public void addOnCrawlingChangeStateListener(IEventListener<WebCrawlerEvent> listener) {

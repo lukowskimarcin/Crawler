@@ -1,12 +1,10 @@
-package application;
+package org.crawler.cdi;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-
-import org.crawler.cdi.StartupScene;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,18 +19,16 @@ public class ApplicationStarter {
 	
 	public void launchJavaFXApplication(@Observes @StartupScene Stage primaryStage) {
 		try {
-
 			primaryStage.setTitle("Crawler");
-		 
 
 			InputStream image = new FileInputStream("src/main/resources/icon.png");
 			primaryStage.getIcons().add(new Image(image));
 
-			InputStream is = getClass().getResourceAsStream("Sample.fxml");
+			InputStream is = new FileInputStream("src/main/java/application/Sample.fxml");
 			Parent root = (Parent) fxmlLoader.load(is);
 
 			Scene scene = new Scene(root, 400, 400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add("src/main/java/application/application.css");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch (Exception e) {
