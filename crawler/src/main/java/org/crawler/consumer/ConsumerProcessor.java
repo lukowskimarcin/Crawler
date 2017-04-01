@@ -28,7 +28,13 @@ public class ConsumerProcessor implements Runnable {
 			try {
 				CrawlTask task = items.take();
 				task.process();
-
+				System.out.println("procesor wait - start");
+				 
+				synchronized (items) {
+					items.wait();
+				}
+				
+				System.out.println("procesor wait - end");
 			} catch (InterruptedException ex) {
 				log.log(Level.SEVERE, "Thread interrupt", ex);
 				Thread.currentThread().interrupt();

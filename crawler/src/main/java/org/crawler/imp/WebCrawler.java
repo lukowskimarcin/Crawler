@@ -206,6 +206,11 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	public synchronized void addCompletePage(CrawlTask page) {
 		processingPages.remove(page);
 		completePages.add(page);
+		//Informacja dla procesorow
+		synchronized (completePages) {
+			completePages.notifyAll(); 
+		}
+		
 		completed.incrementAndGet();
 		
 		unRegisterTask();
