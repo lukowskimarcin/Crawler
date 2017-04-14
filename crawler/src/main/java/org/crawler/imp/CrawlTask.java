@@ -107,7 +107,9 @@ public abstract class CrawlTask implements Runnable, Serializable {
 	/**
 	 * Przetwarzanie danych strony po pobraniu
 	 */
-	public abstract void process();  
+	public void process() {
+		
+	}
 	
 	
 	/**
