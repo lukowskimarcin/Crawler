@@ -1,12 +1,6 @@
 package org.crawler.app;
 
-import java.util.List;
-
-import org.crawler.IWebCrawler;
 import org.crawler.imp.CrawlTask;
-import org.crawler.imp.WebCrawler;
-import org.crawler.imp.CrawlTask;
-import org.crawler.utils.Proxy;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -15,7 +9,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 public class ProxyCentrumPagesCrawler extends CrawlTask {
