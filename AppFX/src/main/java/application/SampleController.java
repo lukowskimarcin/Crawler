@@ -49,6 +49,8 @@ public class SampleController {
 	}
 	
 	private void init() {
+		//crawler.setMaxTasksNumber(4);
+		
 		crawler.addOnCrawlingFinishedListener(e -> {
 			System.out.println("FINISHED " + String.format("[%.2f sec] !!!", e.getElapsedTime() * 1.0 / 1000) );
 			progressBar.setProgress(1.0);

@@ -7,7 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -42,7 +44,6 @@ public class ProxyManager {
 	}
 	
 	public void addProxy(Proxy proxy) {
-		log.info("add: " +proxy);
 		proxies.add(proxy);
 	}
 	
@@ -68,26 +69,60 @@ public class ProxyManager {
 	 */
 	public Proxy getProxy() {
 		Random rn = new Random();
-		int index = rn.nextInt((proxies.size()) + 1);
+		int index = rn.nextInt(proxies.size());
 		return getProxy(index);
 	}
 	
+	public void initSystemProperty(Proxy proxy) {
+		if(proxy.getLogin()!=null && proxy.getPassword()!= null) {
+			System.setProperty("http.proxyUser", proxy.getLogin());
+			System.setProperty("http.proxyPassword", proxy.getPassword()); 
+			
+		    final String proxyUser = proxy.getLogin();
+		    final String proxyPassword = proxy.getPassword();
+
+		    if (proxyUser != null && proxyPassword != null) {
+		        Authenticator.setDefault(
+		          new Authenticator() {
+		            public PasswordAuthentication getPasswordAuthentication() {
+		              return new PasswordAuthentication(
+		                proxyUser, proxyPassword.toCharArray()
+		              );
+		            }
+		          }
+		        );
+		    }
+		}
+	}	
+	 
+	
 	public boolean testProxy(Proxy proxy){
 		try {
+			initSystemProperty(proxy);
+			
 			String proxyHost = proxy.getHost();
 			int proxyPort = proxy.getPort();
-			SocketAddress addr = new InetSocketAddress(proxyHost, proxyPort);
-			java.net.Proxy httpProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, addr);
+			java.net.Proxy httpProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
 			
-			URLConnection urlConn = null;
-			URL url = new URL("https://www.google.pl");
-			urlConn = url.openConnection(httpProxy);
-			urlConn.setConnectTimeout(CONNECTION_TIMEOUT);
-			urlConn.connect();
+			URL url = new URL("https://www.google.com");
+			URLConnection con = url.openConnection(httpProxy);
 			
-			log.info(proxy + " SUCCES");
+			con.setConnectTimeout(CONNECTION_TIMEOUT);
+			con.connect();
+			
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+			// Read it ...
+			String inputLine;
+			while ((inputLine = in.readLine()) != null)
+			    System.out.println(inputLine);
+			
+			in.close();
+			
+			
+			log.info(proxy + " test SUCCES");
 		}	catch (Exception ex) {
-			log.info(proxy + " FAIL : " + ex.getMessage());
+			log.info(proxy + " test FAIL : " + ex.getMessage());
 			return false;
 		}
 		return true;
@@ -161,13 +196,16 @@ public class ProxyManager {
 	
 	public static void main(String[] args) {
 		//Lista proxy : http://prx.centrump2p.com/
+		//https://www.us-proxy.org
 		//http://proxylist.hidemyass.com/6#listable
-		ProxyManager manager = new ProxyManager("E:/proxy.txt");
+		ProxyManager manager = new ProxyManager();
+		//manager.addProxy(new Proxy("112.5.220.199", 80));
 		
-		manager.addProxy(new Proxy("112.5.220.199", 80));
+		manager.addProxy(new Proxy("47.91.78.201", 3128));
+		 
 		
 		manager.testProxies();
-		manager.saveProxies("E:/checkedProxy.txt");
+	 
 	}
 	 
 }

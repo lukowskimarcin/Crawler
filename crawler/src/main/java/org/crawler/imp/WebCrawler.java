@@ -63,6 +63,10 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	
 	private Long endTime = null;
 	
+	private Integer maxCrawlDeep = null;
+	
+	private Integer maxCrawlTasksNumber = null;
+	
 	/**
 	 * Gdy osiągnie zero oznacza koniec przetwarzania
 	 */
@@ -113,30 +117,34 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 	
 	@Override	
 	public void addTask(CrawlTask task) {
-		setStartTime();
-		registerTask();
-		task.init(this);
-		
-		try {
-			Future<?> future = pool.submit(task);
-			futures.add(future);
-		}catch (RejectedExecutionException ex) {
-			fireOnTaskRejected(task);
+		if(maxCrawlTasksNumber==null || maxCrawlTasksNumber.compareTo(counter.get()) >= 0 ) { 
+			if(maxCrawlDeep==null || maxCrawlDeep.compareTo(task.getLevel()) >= 0 ) {
+				
+				if(task.validateUrl()){
+					initStartTime();
+					registerTask();
+					task.init(this);
+					
+					try {
+						Future<?> future = pool.submit(task);
+						futures.add(future);
+					}catch (RejectedExecutionException ex) {
+						task.setErrorMessage(ex.getMessage());
+						fireOnTaskRejected(task);
+					}		
+				} else {
+					task.setErrorMessage("invalid Url");
+					fireOnTaskRejected(task);
+				}
+				
+			}
 		}
 	}
 	
 	@Override
 	public void addTask(Collection<CrawlTask> tasks){
-		setStartTime();
 		for(CrawlTask task : tasks) {
-			registerTask();
-			task.init(this);
-			try {
-				Future<?> future = pool.submit(task);
-				futures.add(future);
-			}catch (RejectedExecutionException ex) {
-				fireOnTaskRejected(task);
-			}
+			addTask(task);
 		}
 	}
 	
@@ -243,7 +251,7 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		}
 	}
 	
-	private void setStartTime() {
+	private void initStartTime() {
 		if(startTime==null) {
 			startTime = System.currentTimeMillis();
 		}
@@ -335,6 +343,23 @@ public class WebCrawler extends CrawlTaskBaseListener implements IWebCrawler, IC
 		}
 		
 	}
-	
+
+	public Integer getMaxCrawlDeep() {
+		return maxCrawlDeep;
+	}
+
+	public void setMaxCrawlDeep(Integer maxCrawlDeep) {
+		this.maxCrawlDeep = maxCrawlDeep;
+	}
+
+	public Integer getMaxCrawlTasksNumber() {
+		return maxCrawlTasksNumber;
+	}
+
+	public void setMaxCrawlTasksNumber(Integer maxCrawlTasksNumber) {
+		this.maxCrawlTasksNumber = maxCrawlTasksNumber;
+	}
+
+	 
 	
 }

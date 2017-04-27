@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
 
 import org.crawler.IEventListener;
-import org.crawler.IWebCrawler;
 import org.crawler.events.CrawlTaskEvent;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -47,7 +45,7 @@ public abstract class CrawlTask implements Runnable, Serializable {
 		this.level = 0;
 	}
 	
-	public CrawlTask(String url,   int level) {
+	public CrawlTask(String url, int level) {
 		this.url = url;
 		this.level = level;
 	}
@@ -109,6 +107,14 @@ public abstract class CrawlTask implements Runnable, Serializable {
 	 */
 	public void process() {
 		
+	}
+	
+	/**
+	 * Chceck if url is valid
+	 * @return
+	 */
+	public boolean validateUrl() {
+		return true;
 	}
 	
 	
